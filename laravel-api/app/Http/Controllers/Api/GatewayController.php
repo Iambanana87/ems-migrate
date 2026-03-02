@@ -102,7 +102,8 @@ class GatewayController extends Controller
         'DeviceAction.createPublic' => [DeviceActionController::class, 'createPublic'],
         'DeviceAction.listV2' => [DeviceActionController::class, 'listV2'],
         'DeviceAction.listActionPlans' => [DeviceActionController::class, 'listActionPlans'],
-        'DeviceAction.updateActionPlanStatus' => [DeviceActionController::class, 'updateActionPlanStatus'],  // admin
+        'DeviceAction.updateActionPlanStatus' => [DeviceActionController::class, 'updateActionPlanStatus'],
+        'DeviceAction.deleteActionPlan' => [DeviceActionController::class, 'deleteActionPlan'],  // admin
 
         // ── Device Status (manual override) ────────────────────────────────────
         // Legacy: backend/backend.php (?action=update_device_status)

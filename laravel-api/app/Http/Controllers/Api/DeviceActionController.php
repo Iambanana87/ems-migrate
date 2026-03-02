@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Concerns\RequiresAuth;
 use App\Http\Requests\DeviceAction\ActionIdRequest;
 use App\Http\Requests\DeviceAction\CreateActionPublicRequest;
 use App\Http\Requests\DeviceAction\CreateDeviceActionRequest;
+use App\Http\Requests\DeviceAction\DeleteActionPlanRequest;
 use App\Http\Requests\DeviceAction\ListActionPlansRequest;
 use App\Http\Requests\DeviceAction\ListDeviceActionsV2Request;
 use App\Http\Requests\DeviceAction\RejectActionRequest;
@@ -227,6 +228,29 @@ class DeviceActionController extends Controller
 
         try {
             $data = $this->actionService->updateActionPlanStatus($request->validated(), $who);
+            return response()->json(['success' => true], 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            // Because legacy explicitly intercepts Plan ID with -> `http_response_code(400); echo json_encode(['error' => 'plan_id required'])`
+            if ($e->getCode() === 400) {
+                 return response()->json(['error' => $e->getMessage()], 400, [], \JSON_UNESCAPED_UNICODE);
+            }
+            return response()->json(['error' => $e->getMessage()], 500, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | m=delete_action_plan
+    |--------------------------------------------------------------------------
+    */
+    public function deleteActionPlan(DeleteActionPlanRequest $request): JsonResponse
+    {
+        $claims = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
+        $whoId  = (int)($claims['id'] ?? 0);
+        $who    = $claims['username'] ?? ('user-' . $whoId);
+
+        try {
+            $this->actionService->deleteActionPlan($request->validated(), $who);
             return response()->json(['success' => true], 200, [], \JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             // Because legacy explicitly intercepts Plan ID with -> `http_response_code(400); echo json_encode(['error' => 'plan_id required'])`

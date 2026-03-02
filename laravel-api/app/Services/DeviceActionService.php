@@ -548,4 +548,92 @@ final class DeviceActionService
             );
         });
     }
+
+    public function deleteActionPlan(array $data, string $who): void
+    {
+        $planId = (int)($data['plan_id'] ?? 0);
+        if ($planId <= 0) {
+            throw new \Exception('plan_id required', 400);
+        }
+
+        DB::transaction(function () use ($planId, $data, $who): void {
+            // BEFORE (plan)
+            $st1 = "SELECT * FROM device_action_plans WHERE id=?";
+            $beforePlanRaw = DB::select($st1, [$planId]);
+            if (empty($beforePlanRaw)) {
+                throw new \Exception('Plan not found');
+            }
+            $beforePlan = (array) $beforePlanRaw[0];
+            $aid = (int)$beforePlan['action_id'];
+
+            // Lấy user reason & chuẩn bị cho audit.reason
+            $userReason = trim((string)($data['reason'] ?? ''));
+            $context = 'device_action_plans:delete#'.$planId;
+            $reasonForAudit = $userReason !== '' ? $userReason : $context;
+            if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+                if (mb_strlen($reasonForAudit) > 100) $reasonForAudit = mb_substr($reasonForAudit, 0, 100);
+            } else {
+                if (strlen($reasonForAudit) > 100) $reasonForAudit = substr($reasonForAudit, 0, 100);
+            }
+
+            // DELETE
+            $st2 = "DELETE FROM device_action_plans WHERE id=?";
+            DB::delete($st2, [$planId]);
+
+            // AUDIT (delete plan)
+            $this->audit->log(
+                'delete',
+                $reasonForAudit,
+                $beforePlan,
+                [],
+                $who
+            );
+
+            // Recalc ISSUE
+            $st3 = "
+                SELECT SUM(status='done') AS done, COUNT(*) AS total
+                FROM device_action_plans
+                WHERE action_id=?
+            ";
+            $aggRaw = DB::select($st3, [$aid]);
+            $agg = empty($aggRaw) ? null : (array) $aggRaw[0];
+
+            $st4 = "SELECT id, status, approval_status FROM device_actions WHERE id=?";
+            $beforeIssueRaw = DB::select($st4, [$aid]);
+
+            if (!empty($beforeIssueRaw)) {
+                $beforeIssue = (array) $beforeIssueRaw[0];
+                $newStatus = $beforeIssue['status'];
+                $newAppr   = $beforeIssue['approval_status'];
+
+                if ($agg && (int)$agg['total'] > 0) {
+                    if ((int)$agg['done'] === 0) {
+                        $newStatus = 'open';
+                    } elseif ((int)$agg['done'] < (int)$agg['total']) {
+                        $newStatus = 'in_progress';
+                    } else {
+                        $newStatus = 'done';
+                        $newAppr = ($beforeIssue['approval_status'] === 'approved') ? 'approved' : 'pending';
+                    }
+                }
+
+                if ($newStatus !== $beforeIssue['status'] || $newAppr !== $beforeIssue['approval_status']) {
+                    $st5 = "UPDATE device_actions SET status=?, approval_status=? WHERE id=?";
+                    DB::update($st5, [$newStatus, $newAppr, $aid]);
+
+                    $st6 = "SELECT id, status, approval_status FROM device_actions WHERE id=?";
+                    $afterIssueRaw = DB::select($st6, [$aid]);
+                    $afterIssue = (array) $afterIssueRaw[0];
+
+                    $this->audit->log(
+                        'update',
+                        'device_actions:auto_status_recalc#'.$aid.' (after plan delete)',
+                        $beforeIssue,
+                        $afterIssue,
+                        $who
+                    );
+                }
+            }
+        });
+    }
 }
