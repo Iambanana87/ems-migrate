@@ -430,4 +430,122 @@ final class DeviceActionService
             'items'     => $rows,
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PUBLIC WRITE
+    |--------------------------------------------------------------------------
+    */
+
+    public function updateActionPlanStatus(array $data, string $who): void
+    {
+        $planId = (int)($data['plan_id'] ?? 0);
+        $status = (($data['status'] ?? 'open') === 'done') ? 'done' : 'open';
+        $userReason = trim((string)($data['reason'] ?? ''));
+
+        if ($planId <= 0) {
+            throw new \Exception('plan_id required', 400);
+        }
+
+        DB::transaction(function () use ($planId, $status, $userReason, $who): void {
+            // 1) BEFORE (plan)
+            $st1 = "SELECT * FROM device_action_plans WHERE id=?";
+            $beforePlanRaw = DB::select($st1, [$planId]);
+            if (empty($beforePlanRaw)) {
+                throw new \Exception('Plan not found');
+            }
+            $beforePlan = (array) $beforePlanRaw[0];
+
+            // 2) Update plan status
+            $st2 = "UPDATE device_action_plans SET status=? WHERE id=?";
+            DB::update($st2, [$status, $planId]);
+
+            // 3) AFTER (plan)
+            $st3 = "SELECT * FROM device_action_plans WHERE id=?";
+            $afterPlanRaw = DB::select($st3, [$planId]);
+            $afterPlan = (array) $afterPlanRaw[0];
+
+            // 4) Recalc ISSUE (device_actions) theo tổng plan
+            $aid = (int)($afterPlan['action_id'] ?? $beforePlan['action_id'] ?? 0);
+            if ($aid > 0) {
+                $st4 = "
+                    SELECT SUM(status='done') AS done, COUNT(*) AS total
+                    FROM device_action_plans
+                    WHERE action_id=?
+                ";
+                $aggRaw = DB::select($st4, [$aid]);
+                $agg = empty($aggRaw) ? null : (array) $aggRaw[0];
+
+                // BEFORE (issue)
+                $st5 = "SELECT id, status, approval_status FROM device_actions WHERE id=?";
+                $beforeIssueRaw = DB::select($st5, [$aid]);
+                
+                if (!empty($beforeIssueRaw)) {
+                    $beforeIssue = (array) $beforeIssueRaw[0];
+                    $newStatus = $beforeIssue['status'];
+                    $newAppr   = $beforeIssue['approval_status'];
+
+                    if ($agg && (int)$agg['total'] > 0) {
+                        if ((int)$agg['done'] === 0) {
+                            $newStatus = 'open';
+                        } elseif ((int)$agg['done'] < (int)$agg['total']) {
+                            $newStatus = 'in_progress';
+                        } else {
+                            $newStatus = 'done';
+                            $newAppr   = ($beforeIssue['approval_status'] === 'approved') ? 'approved' : 'pending';
+                        }
+                    }
+
+                    if ($newStatus !== $beforeIssue['status'] || $newAppr !== $beforeIssue['approval_status']) {
+                        $st6 = "UPDATE device_actions SET status=?, approval_status=? WHERE id=?";
+                        DB::update($st6, [$newStatus, $newAppr, $aid]);
+
+                        // AFTER (issue) - Legacy conditional variable ENABLE_ISSUE_AUTORECALC_AUDIT is logically disabled
+                        if (defined('ENABLE_ISSUE_AUTORECALC_AUDIT') && ENABLE_ISSUE_AUTORECALC_AUDIT) {
+                            $st7 = "SELECT id, status, approval_status FROM device_actions WHERE id=?";
+                            $afterIssueRaw = DB::select($st7, [$aid]);
+                            $afterIssue = (array) $afterIssueRaw[0];
+
+                            $this->audit->log(
+                                'update',
+                                'device_actions:auto_status_recalc#'.$aid,
+                                $beforeIssue,
+                                $afterIssue,
+                                $who
+                            );
+                        }
+                    }
+                }
+            }
+
+            // 5) Chuẩn bị REASON cho audit.reason (ưu tiên user nhập)
+            $reasonForAudit = ($userReason !== '') ? $userReason : ('device_action_plans:status#'.$planId);
+            if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+                if (mb_strlen($reasonForAudit) > 100) $reasonForAudit = mb_substr($reasonForAudit, 0, 100);
+            } else {
+                if (strlen($reasonForAudit) > 100) $reasonForAudit = substr($reasonForAudit, 0, 100);
+            }
+
+            // 6) Gắn snapshot để frontend render bảng gọn
+            $snapshot = [
+                'plan_id'   => (int)($afterPlan['id'] ?? $beforePlan['id'] ?? 0),
+                'plan_code' => (string)($afterPlan['plan_code'] ?? $beforePlan['plan_code'] ?? ''),
+                'plan_text' => (string)($afterPlan['plan_text'] ?? $beforePlan['plan_text'] ?? ''),
+                'est_date'  => (string)($afterPlan['est_date'] ?? $beforePlan['est_date'] ?? ''),
+                'owner'     => (string)($afterPlan['owner_name'] ?? $afterPlan['owner'] ?? $beforePlan['owner_name'] ?? $beforePlan['owner'] ?? ''),
+            ];
+            
+            $beforePlan['__plan_snapshot'] = null;
+            $afterPlan['__plan_snapshot']  = $snapshot;
+
+            // 7) AUDIT
+            $this->audit->log(
+                'update',
+                $reasonForAudit,
+                $beforePlan,
+                $afterPlan,
+                $who
+            );
+        });
+    }
 }
