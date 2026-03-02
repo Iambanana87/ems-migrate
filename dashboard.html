@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Summary Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/all.min.css"> <link rel="stylesheet" href="assets/css/local-fonts.css"> <link rel="stylesheet" href="assets/css/flatpickr.min.css">
+    <link rel="stylesheet" href="assets/css/confirmDate.css">
+    <link rel="icon" type="image/png" href="image/icon2.png">
+    <link rel="stylesheet" href="assets/css/translation.css">
+    <script src="assets/js/tailwindcss.js"></script>
+    <script src="assets/js/vue.min.js"></script>
+    <script src="assets/js/flatpickr.js"></script>
+    <script src="assets/js/chart.js"></script>
+    <script src="assets/js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="assets/js/confirmDate.js"></script>
+    <script src="assets/js/translations.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .summary-table {
+            /* border-collapse: separate;
+            border-spacing: 0 1rem; */
+            width: 100%;
+            max-width: 1400px;
+            margin: 1rem auto;
+        }
+        .summary-table thead th {
+            color: #6c757d;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+            vertical-align: middle;
+        }
+
+        .summary-table thead tr:first-child th {
+            border-bottom: 2px solid #dee2e6;
+            text-align: center;
+        }
+
+        .summary-table thead tr:last-child th {
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-bottom: none;
+        }
+        .summary-table tbody tr {
+            background-color: #ffffff;
+            border-radius: 10px;
+            /* box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); */
+            transition: transform 0.2s;
+        }
+        /* .summary-table td:hover{
+            transform: translateY(-5px);
+        } */
+
+
+.summary-table td {
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+  border-radius: 10px;
+}
+
+.summary-table td:hover {
+  background-color: white;
+  transform: translateY(-10px);
+}
+        
+        .summary-table td {
+            padding: 1.5rem 1rem;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .summary-table .process-name {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #343a40;
+            text-align: left;
+            padding-left: 2rem;
+        }
+        .status-item, .efficiency-item, .output-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .status-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .status-total .status-value { color: #3498db; }
+        .status-running .status-value { color: #2ecc71; }
+        .status-breakdown .status-value { color: #f39c12; }
+        .status-warning .status-value { color: #e74c3c; }
+
+        @property --p{
+          syntax: '<number>';
+          inherits: true;
+          initial-value: 0;
+        }
+        .pie {
+          --p: 0;
+          --b: 10px;
+          --c: #2ecc71;
+          --w: 100px;
+          width: var(--w);
+          aspect-ratio: 1;
+          position: relative;
+          display: inline-grid;
+          place-content: center;
+          font-size: 1rem;
+          font-weight: bold;
+          color: var(--c);
+          margin: 5px;
+          transition: --p 1s;
+          white-space: nowrap;
+        }
+        .pie:before,
+        .pie:after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+        }
+        .pie:before {
+          inset: 0;
+          background:
+            radial-gradient(farthest-side,var(--c) 98%,#0000) top/var(--b) var(--b) no-repeat,
+            conic-gradient(var(--c) calc(var(--p)*1%),#0000 0);
+          -webkit-mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+                  mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+        }
+        .pie:after {
+            inset: calc(50% - var(--b)/2);
+            background: var(--c);
+            transform: rotate(calc(var(--p)*3.6deg)) translateY(calc(50% - var(--w)/2));
+        }
+        .output-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #343a40;
+        }
+        .output-subtext {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #e74c3c;
+        }
+        .output-subtext .pcs{
+            color :#000;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        
+html, body { overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ≤ 1536px */
+@media (max-width: 1536px){
+  .summary-table .status-item { padding: .35rem .5rem; }
+  .summary-table .pie { --w: 72px; }
+  .summary-table .output-value { font-size: 1.25rem; }
+  .summary-table .output-subtext { font-size: .8rem; }
+}
+
+/* ≤ 1366px */
+@media (max-width: 1366px){
+  .summary-table .pie { --w: 64px; }
+  .summary-table .output-value { font-size: 1.125rem; }
+  .summary-table th, .summary-table td { padding: .35rem .4rem; }
+}
+
+/* ≥ 1920px (2K+): to dần nhưng KHÔNG vượt viewport */
+@media (min-width: 1920px){
+  /* Luôn fit theo viewport: không bao giờ rộng hơn 90–95vw */
+  .summary-table{
+    width: 100%;
+    max-width: clamp(1200px, 92vw, 2200px);
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;                /* tránh ô tự kéo rộng gây tràn */
+    border-spacing: clamp(.5rem, .4rem + .2vw, .9rem) clamp(.5rem, .4rem + .2vw, .9rem);
+  }
+
+  /* Padding tăng vừa phải để không “đội” bề rộng */
+  .summary-table th,
+  .summary-table td{
+    padding: clamp(0.6rem, 0.5rem + 0.2vw, 1rem);
+    white-space: nowrap;                /* tránh xuống dòng làm bể layout */
+  }
+
+  /* Chữ to dần theo viewport nhưng có trần */
+  .process-name{ font-size: clamp(1.5rem, 1.1rem + 0.6vw, 2.2rem); }
+  .status-value{ font-size: clamp(2rem, 1.5rem + 1vw, 3.25rem); }
+  .output-value{ font-size: clamp(1.25rem, 1rem + 0.5vw, 2rem); }
+  .th-box{ font-size: clamp(0.8rem, 0.7rem + 0.25vw, 1.05rem); }
+
+  /* Pie chart tăng theo viewport nhưng không vượt trần */
+  .pie{
+    --w: clamp(90px, 5.5vw, 160px);     /* đường kính */
+    --b: clamp(8px, 0.7vw, 16px);       /* độ dày vòng */
+    font-size: clamp(1rem, 0.9rem + 0.25vw, 1.3rem);
+  }
+}
+
+/* ≥ 2560px (2.5K/4K): to thêm nhưng vẫn ≤ viewport */
+@media (min-width: 2560px){
+  :root { font-size: 18px; }            /* nếu nơi khác dùng rem/em */
+
+  .summary-table{
+    max-width: clamp(1200px, 90vw, 2400px);
+    border-spacing: clamp(.6rem, .5rem + .2vw, 1rem) clamp(.6rem, .5rem + .2vw, 1rem);
+  }
+
+  .summary-table th,
+  .summary-table td{
+    padding: clamp(0.75rem, 0.6rem + 0.25vw, 1.1rem);
+  }
+
+  .pie{
+    --w: clamp(110px, 6vw, 180px);
+    --b: clamp(10px, 0.8vw, 18px);
+  }
+
+
+
+
+
+  .summary-table .process-name{ font-size: 2rem; padding-left: 2.5rem; }
+  .summary-table .status-item{ padding: .75rem 1rem; }
+  .summary-table .output-value{ font-size: 1.5rem; }
+  .summary-table th, .summary-table td{ padding: .75rem 1rem; }
+
+  /* Header dạng box */
+  .th-box{
+    font-size: 0.9rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  /* Tăng kích thước pie + viền */
+
+
+  /* Số lớn trong Status */
+  .status-value{ font-size: 3rem; }
+}
+
+.th-box {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 3px 3px 0 rgba(0,0,0,0.05);
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Details */
+#details-modal.mode-tuft   [data-col="mold_cavity"],
+#details-modal.mode-tuft   [data-col="actual_cavity"],
+#details-modal.mode-blister[data-col="mold_cavity"],
+#details-modal.mode-blister[data-col="actual_cavity"] { display:none !important; }
+
+/* Efficiency */
+#efficiency-table-modal.mode-tuft   [data-col="mold_cavity"],
+#efficiency-table-modal.mode-tuft   [data-col="actual_cavity"],
+#efficiency-table-modal.mode-blister[data-col="mold_cavity"],
+#efficiency-table-modal.mode-blister[data-col="actual_cavity"] { display:none !important; }
+
+/* Output */
+#output-modal.mode-tuft   [data-col="mold_cavity"],
+#output-modal.mode-tuft   [data-col="actual_cavity"],
+#output-modal.mode-blister[data-col="mold_cavity"],
+#output-modal.mode-blister[data-col="actual_cavity"] { display:none !important; }
+
+        
+        #molding-day-lost,
+#molding-night-lost,
+#molding-total-lost {
+  display: none !important;
+}
+/* Mold Output Report: hide lost pcs */
+#output-modal.mold-hide-lost tr.text-red-600 {           /* hàng summary "Lost (pcs)" */
+  display: none !important;
+}
+#output-modal.mold-hide-lost th[data-col="lostpcs"],
+#output-modal.mold-hide-lost td.col-total-lost-pcs,
+#output-modal.mold-hide-lost th[data-col="losttime"],
+#output-modal.mold-hide-lost td.col-lost-time {
+  display: none !important;
+}
+        /* .summary-table thead tr:last-child th:nth-child(4),
+        .summary-table tbody td:nth-child(5) {
+            box-shadow: 2px 0 0 0 #f4f7f6, 4px 0 0 0 #e5e7eb;
+        }
+        
+        .summary-table thead tr:last-child th:nth-child(7),
+        .summary-table tbody td:nth-child(8) {
+            box-shadow: 2px 0 0 0 #f4f7f6, 4px 0 0 0 #e5e7eb;
+        } */
+.flatpickr-confirm .confirmDate-button { background-color: #3b82f6 !important; color: white !important; font-weight: 600 !important; font-size: 14px !important; line-height: 1 !important; text-decoration: none !important; padding: 8px 16px !important; border: none !important; border-radius: 0.375rem !important; cursor: pointer !important; transition: background-color 0.2s ease-in-out !important; }
+.flatpickr-confirm .confirmDate-button:hover { background-color: #2563eb !important; }
+/* Button style từ Uiverse.io */
+.custom-btn {
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin: 0 10px; /* tạo khoảng cách giữa 2 button */
+}
+
+.custom-btn:hover {
+  background-color: #268fda;
+  box-shadow: 0px 15px 20px rgba(46, 189, 229, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.custom-btn:active {
+  transform: translateY(-1px);
+}
+
+    </style>
+</head>
+<body class="">
+    <header class="flex justify-between items-center mb-4 p-4 bg-white shadow-md rounded-lg">
+    <div class="flex items-center space-x-4">
+        <a href="dashboard.html" class="flex items-center space-x-3">
+            <img src="image/icon2.png" alt="Logo" class="h-10">
+            <img src="image/ems_.png" alt="EMS Logo" class="h-8">
+        </a>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-700">EMS Dashboard</h1>
+
+    <div class="flex items-center space-x-6">
+        <div class="text-lg font-semibold text-gray-600" id="datetime-display"></div>
+
+        <div class="relative">
+            <button id="menu-button" class="p-2 rounded-md hover:bg-gray-200 transition-colors">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+            
+            <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border">
+                <a href="index.html" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                    <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    EMS Monitoring
+                </a>
+                <a href="backend/backend.php" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                    <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    System Settings
+                </a>
+                <a href="family.html" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                    <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Family
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="flex justify-left mb-2">
+  <button onclick="window.location.href='index.html'" class="custom-btn">Overall</button>
+  <button onclick="window.location.href='family.html'" class="custom-btn">Family</button>
+</div>
+
+    <main>
+        <table class="summary-table  border-separate border-spacing-x-4 border-spacing-y-4 ">
+            <thead>
+    <tr>
+      <th rowspan="2" class="th-box">Process</th>
+      <th colspan="4" class="th-box">Status</th>
+      <th colspan="3" class="th-box">Efficiency</th>
+      <th colspan="3" class="th-box">Output</th>
+    </tr>
+    <tr>
+      <th class="th-box">Total</th>
+      <th class="th-box">Running</th>
+      <th class="th-box">Break Down</th>
+      <th class="th-box">Warning</th>
+      <th class="th-box">07:00 ~ 19:00</th>
+      <th class="th-box">19:00 ~ 07:00</th>
+      <th class="th-box">Average</th>
+      <th class="th-box">07:00 ~ 19:00</th>
+      <th class="th-box">19:00 ~ 07:00</th>
+      <th class="th-box">Total</th>
+    </tr>
+  </thead>
+            <tbody >
+    <tr>
+        <td class="process-name cursor-pointer hover:text-blue-600" onclick="openDetailsPopup('mold')">Molding</td>
+        <td onclick="openDetailsPopup('mold','total')"    class="cursor-pointer hover:text-blue-600"><div class="status-item status-total "><span id="molding-total" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('mold','running')"  class="cursor-pointer hover:text-blue-600"><div class="status-item status-running "><span id="molding-running" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('mold','breakdown')"  class="cursor-pointer hover:text-blue-600"><div class="status-item status-breakdown "><span id="molding-breakdown" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('mold','warning')"  class="cursor-pointer hover:text-blue-600"><div class="status-item status-warning "><span id="molding-warning" class="status-value">0</span></div></td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('mold','day')">
+            <div class="efficiency-item">
+                <div id="molding-day-eff-pie" class="pie" style="--p:0;"><span id="molding-day-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('mold','night')">
+            <div class="efficiency-item">
+                <div id="molding-night-eff-pie" class="pie" style="--p:0;"><span id="molding-night-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('mold','avg')">
+            <div class="efficiency-item">
+                <div id="molding-avg-eff-pie" class="pie" style="--p:0;"><span id="molding-avg-eff">0</span></div>
+            </div>
+        </td>
+        <td id="molding_output_7-9" class="cursor-pointer" onclick="openOutputPopup('mold',event)">
+            <div class="output-item">
+                <span id="molding-day-output" class="output-value">0</span>
+                <span class="mold_pcs">pcs</span>
+                <div id="molding-day-lost" class="output-subtextt hidden">
+                    <span id="molding-day-lost-pcs">0</span><br> (<span id="molding-day-lost-percent">0</span>%) <br> <span class="pcs" id="molding-day-lost-pcs">pcs</span>
+                    
+                </div>
+            </div>
+        </td>
+        <td id="molding_output_9-7"class="cursor-pointer" onclick="openOutputPopup('mold',event)">
+            <div class="output-item">
+                <span id="molding-night-output" class="output-value">0</span>
+                <span class="mold_pcs">pcs</span>
+                <div id="molding-night-lost" class="output-subtextt hidden">
+                    <span id="molding-night-lost-pcs">0</span> <br>(<span id="molding-night-lost-percent">0</span>%) <br> <span class="pcs" id="molding-day-lost-pcs">pcs</span>
+                </div>
+            </div>
+        </td>
+        <td id="molding_output_total" class="cursor-pointer" onclick="openOutputPopup('mold',event)">
+            <div class="output-item">
+                <span id="molding-total-output" class="output-value">0</span>
+                <span class="mold_pcs">pcs</span>
+                <div id="molding-total-lost" class="output-subtextt hidden">
+                    <span id="molding-total-lost-pcs">0</span> <br>(<span id="molding-total-lost-percent">0</span>%)<br> <span class="pcs" id="molding-day-lost-pcs">pcs</span>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="process-name cursor-pointer hover:text-blue-600" onclick="openDetailsPopup('tuft')">Tufting</td>
+        <td onclick="openDetailsPopup('tuft','total')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-total "><span id="tufting-total" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('tuft','running')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-running "><span id="tufting-running" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('tuft','breakdown')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-breakdown "><span id="tufting-breakdown" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('tuft','warning')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-warning "><span id="tufting-warning" class="status-value">0</span></div></td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('tuft','day')">
+            <div class="efficiency-item">
+                <div id="tufting-day-eff-pie" class="pie" style="--p:0;"><span id="tufting-day-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('tuft','night')">
+            <div class="efficiency-item">
+                <div id="tufting-night-eff-pie" class="pie" style="--p:0;"><span id="tufting-night-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('tuft','avg')">
+            <div class="efficiency-item">
+                <div id="tufting-avg-eff-pie" class="pie" style="--p:0;"><span id="tufting-avg-eff">0</span></div>
+            </div>
+        </td>
+        <td id="tufting_output_7-9" class="cursor-pointer" onclick="openOutputPopup('tuft',event)">
+            <div class="output-item">
+                <span id="tufting-day-output" class="output-value">0</span>
+                <div id="tufting-day-lost" class="output-subtext hidden">
+                    <span id="tufting-day-lost-pcs">0</span> <br> (<span id="tufting-day-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+        <td id="tufting_output_9-7" class="cursor-pointer" onclick="openOutputPopup('tuft',event)">
+            <div class="output-item">
+                <span id="tufting-night-output" class="output-value">0</span>
+                <div id="tufting-night-lost" class="output-subtext hidden">
+                    <span id="tufting-night-lost-pcs">0</span> <br> (<span id="tufting-night-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+        <td id="tufting_output_total" class="cursor-pointer" onclick="openOutputPopup('tuft',event)">
+            <div class="output-item">
+                <span id="tufting-total-output" class="output-value">0</span>
+                <div id="tufting-total-lost" class="output-subtext hidden">
+                    <span id="tufting-total-lost-pcs">0</span> <br> (<span id="tufting-total-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="process-name cursor-pointer hover:text-blue-600" onclick="openDetailsPopup('blister')">Blistering</td>
+        <td onclick="openDetailsPopup('blister','total')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-total "><span id="blistering-total" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('blister','running')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-running"><span id="blistering-running" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('blister','breakdown')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-breakdown"><span id="blistering-breakdown" class="status-value">0</span></div></td>
+        <td onclick="openDetailsPopup('blister','warning')"     class="cursor-pointer hover:text-blue-600"><div class="status-item status-warning"><span id="blistering-warning" class="status-value">0</span></div></td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('blister','day')">
+            <div class="efficiency-item">
+                <div id="blistering-day-eff-pie" class="pie" style="--p:0;"><span id="blistering-day-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('blister','night')">
+            <div class="efficiency-item">
+                <div id="blistering-night-eff-pie" class="pie" style="--p:0;"><span id="blistering-night-eff">0</span></div>
+            </div>
+        </td>
+        <td class="cursor-pointer" onclick="openEfficiencyTablePopup('blister','avg')">
+            <div class="efficiency-item">
+                <div id="blistering-avg-eff-pie" class="pie" style="--p:0;"><span id="blistering-avg-eff">0</span></div>
+            </div>
+        </td>
+        <td id="blistering_output_7-9" class="cursor-pointer" onclick="openOutputPopup('blister',event)">
+            <div class="output-item">
+                <span id="blistering-day-output" class="output-value">0</span>
+                <div id="blistering-day-lost" class="output-subtext hidden">
+                    <span id="blistering-day-lost-pcs">0</span> <br> (<span id="blistering-day-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+        <td id="blistering_output_9-7" class="cursor-pointer" onclick="openOutputPopup('blister',event)">
+            <div class="output-item">
+                <span id="blistering-night-output" class="output-value">0</span>
+                <div id="blistering-night-lost" class="output-subtext hidden">
+                    <span id="blistering-night-lost-pcs">0</span> <br> (<span id="blistering-night-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+        <td id="blistering_output_total" class="cursor-pointer" onclick="openOutputPopup('blister',event)">
+            <div class="output-item">
+                <span id="blistering-total-output" class="output-value">0</span>
+                <div id="blistering-total-lost" class="output-subtext hidden">
+                    <span id="blistering-total-lost-pcs">0</span> <br> (<span id="blistering-total-lost-percent">0</span>%) 
+                </div>
+                <span class="mold_pcs">pcs</span>
+            </div>
+        </td>
+    </tr>
+</tbody>
+        </table>
+    </main>
+
+    <script>
+
+      const $id     = (x) => document.getElementById(x);
+      const setText = (id, val) => { const el = $id(id); if (el) el.textContent = val; };
+      const setCss  = (id, name, val) => { const el = $id(id); if (el) el.style.setProperty(name, val); };
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Hàm mới với định dạng bạn yêu cầu
+        function updateDateTime() {
+            const now = new Date();
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            // Hàm phụ để thêm số 0 vào trước các số có một chữ số (ví dụ: 5 -> "05")
+            const padZero = (num) => String(num).padStart(2, '0');
+
+            const dayOfWeek = days[now.getDay()];
+            const year = now.getFullYear();
+            const month = padZero(now.getMonth() + 1); // getMonth() trả về từ 0-11
+            const day = padZero(now.getDate());
+            const hours = padZero(now.getHours());
+            const minutes = padZero(now.getMinutes());
+            const seconds = padZero(now.getSeconds());
+
+            const formattedDateTime = `${dayOfWeek} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            
+            document.getElementById('datetime-display').textContent = formattedDateTime;
+        }
+  // đặt gần các helper popup efficiency
+  function setPopupPiesFromSummary(effResp, slot) {
+    const slotKey = (slot === 'avg') ? 'average' : slot;
+    const byProc = effResp?.summary_all || null;
+
+    const getVal = (proc) => {
+      const v = byProc?.[proc]?.[slotKey];
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    [
+      { id: 'top-mold',    key: 'mold'    },
+      { id: 'top-tuft',    key: 'tuft'    },
+      { id: 'top-blister', key: 'blister' },
+    ].forEach(({ id, key }) => {
+      const raw = getVal(key);
+      const pieVal = Math.max(0, Math.min(100, raw)); // clamp cho đồ họa
+
+      const pieEl = document.getElementById(`${id}-pie`);
+      const label = document.getElementById(`${id}-val`);
+      if (!pieEl || !label) return;
+
+      // hỗ trợ cả CSS pie (--p) lẫn radial-progress (--value)
+      pieEl.style.setProperty('--p', pieVal);
+      pieEl.style.setProperty('--value', pieVal);
+
+      label.textContent = `${raw.toFixed(2)}%`;
+      pieEl.title = `Efficiency (raw): ${raw.toFixed(2)}%`;
+    });
+  }
+
+    async function fetchLiveStatusSummary() {
+        try {
+            const response = await fetch('api.php?view=all');
+            if (!response.ok) throw new Error('Failed to fetch live device list');
+            const data = await response.json();
+            const allDevices = data.devices || [];
+
+            const processes = ['mold', 'tuft', 'blister'];
+            const statusSummary = {};
+            const U = s => String(s || '').toUpperCase();
+
+            processes.forEach(processName => {
+            const processDevices = allDevices.filter(d => d.display_type === processName);
+            const total     = processDevices.length;
+            const breakdown = processDevices.filter(d => U(d.status) === 'DISCONNECTED').length;
+            const warning   = processDevices.filter(d => U(d.status) === 'BREACHED').length;
+            const running   = total - breakdown; // = Normal + Breached
+
+            statusSummary[processName] = { total, running, breakdown, warning };
+            });
+            return statusSummary;
+
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+    // --- fetch with timeout & abort previous poll ---
+let pollCtl = null;
+
+function fetchWithTimeout(url, opts = {}, ms = 8000, label = 'fetch') {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort('timeout'), ms);
+  const merged = { ...opts, signal: ctl.signal, cache: 'no-store' };
+
+  console.time(`[NET] ${label}`);
+  return fetch(url, merged)
+    .then(r => {
+      console.timeEnd(`[NET] ${label}`);
+      if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
+      return r;
+    })
+    .catch(err => {
+      console.timeEnd(`[NET] ${label}`);
+      console.error(`[NET] ${label} failed:`, err.message || err);
+      throw err;
+    })
+    .finally(() => clearTimeout(t));
+}
+
+async function fetchDashboardSummary({ from = '', to = '' } = {}) {
+  const params = new URLSearchParams({ action: 'get_summary_report', _: Date.now() });
+  if (from) params.set('from', from);
+  if (to)   params.set('to',   to);
+  const url = `api.php?${params.toString()}`;
+  const r = await fetchWithTimeout(url, {}, 30000, 'summary'); // 20s
+  return r.json();
+}
+
+async function fetchLiveStatusSummary() {
+  try {
+    const r = await fetchWithTimeout('api.php?view=all&_=' + Date.now(), {}, 5000, 'live'); // 5s
+    const data = await r.json();
+    const allDevices = data.devices || [];
+    const U = s => String(s || '').toUpperCase();
+    const by = type => {
+      const ds = allDevices.filter(d => d.display_type === type);
+      const total = ds.length;
+      const breakdown = ds.filter(d => U(d.status) === 'DISCONNECTED').length;
+      const warning   = ds.filter(d => U(d.status) === 'BREACHED').length;
+      const running   = total - breakdown;
+      return { total, running, breakdown, warning };
+    };
+    return { mold: by('mold'), tuft: by('tuft'), blister: by('blister') };
+  } catch (e) {
+    console.warn('live status skipped:', e.message || e);
+    return { mold:{total:0,running:0,breakdown:0,warning:0},
+             tuft:{total:0,running:0,breakdown:0,warning:0},
+             blister:{total:0,running:0,breakdown:0,warning:0} };
+  }
+}
+
+   async function fetchAndCombineData() {
+  // 07:00 hôm qua -> 07:00 hôm nay (LOCAL)
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const toVN   = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0);
+  const fromVN = new Date(toVN.getTime() - 24*60*60*1000);
+
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const fromStr = fmt(fromVN), toStr = fmt(toVN);
+
+  // gọi song song; nếu live fail vẫn render summary
+  const [summaryRes, liveRes] = await Promise.allSettled([
+    fetchDashboardSummary({ from: fromStr, to: toStr }),
+    fetchLiveStatusSummary()
+  ]);
+  if (summaryRes.status !== 'fulfilled') throw summaryRes.reason || new Error('summary failed');
+
+  const summary = summaryRes.value;
+  const live = (liveRes.status === 'fulfilled')
+    ? liveRes.value
+    : { mold:{total:0,running:0,breakdown:0,warning:0},
+        tuft:{total:0,running:0,breakdown:0,warning:0},
+        blister:{total:0,running:0,breakdown:0,warning:0} };
+
+  // Map đúng shape mà updateDashboard cần
+  const result = {
+    mold: {
+      status: live.mold,
+      efficiency: {
+        day:     Number(summary.mold?.efficiency?.day    || 0),
+        night:   Number(summary.mold?.efficiency?.night  || 0),
+        average: Number(summary.mold?.efficiency?.average|| 0),
+      },
+      output: summary.mold.output
+    },
+    tuft: {
+      status: live.tuft,
+      efficiency: {
+        day:     Number(summary.tuft?.efficiency?.day    || 0),
+        night:   Number(summary.tuft?.efficiency?.night  || 0),
+        average: Number(summary.tuft?.efficiency?.average|| 0),
+      },
+      output: summary.tuft.output
+    },
+    blister: {
+      status: live.blister,
+      efficiency: {
+        day:     Number(summary.blister?.efficiency?.day    || 0),
+        night:   Number(summary.blister?.efficiency?.night  || 0),
+        average: Number(summary.blister?.efficiency?.average|| 0),
+      },
+      output: summary.blister.output
+    }
+  };
+
+  console.log('[SUMMARY_RANGE]', summary._range);
+  updateDashboard(result);
+}
+
+
+
+    function formatNumber(num) {
+        if (isNaN(num)) return 0;
+        return parseInt(num, 10).toLocaleString('en-US');
+      }
+      function updateDashboard(data) {
+      const processes = ['molding', 'tufting', 'blistering'];
+      const clamp01 = v => Math.max(0, Math.min(100, Number(v) || 0));
+      const fmt = n => Number(n || 0).toLocaleString('en-US');
+
+      function setEff(process, slot, val) {
+    const raw = Number(val);
+    const isNum = Number.isFinite(raw);
+
+    // 1) Label = giá trị thật (không clamp), giữ 2 chữ số thập phân
+    const labelText = isNum ? raw.toFixed(2) + '%' : '0%';
+    setText(`${process}-${slot}-eff`, labelText);
+
+    // 2) Pie = clamp 0–100 cho đồ họa
+    const pieVal = isNum ? Math.max(0, Math.min(100, raw)) : 0;
+    const pieId  = `${process}-${slot}-eff-pie`;
+
+    // Hỗ trợ cả CSS pie (--p) lẫn radial-progress (--value)
+    setCss(pieId, '--p', pieVal);
+    setCss(pieId, '--value', pieVal);
+
+    // 3) Tối ưu hiển thị nếu là radial-progress
+    const pieEl = $id(pieId);
+    if (pieEl && pieEl.classList.contains('radial-progress')) {
+      setCss(pieId, '--size', '4.5rem');
+      setCss(pieId, '--thickness', '6px');
+    }
+
+    // 4) Tooltip nhỏ để thấy số “thật” khi >100% (tuỳ chọn)
+    if (pieEl) pieEl.title = `Efficiency (raw): ${labelText}`;
+  }
+
+    processes.forEach(process => {
+      try {
+        const key = process.replace('ing', ''); // 'mold' | 'tuft' | 'blister'
+        const proc = data[key];
+        if (!proc) return;
+
+        // STATUS
+        setText(`${process}-total`,     fmt(proc.status.total));
+        setText(`${process}-running`,   fmt(proc.status.running));
+        //breakdown = Disconnected
+        /* setText(`${process}-breakdown`, fmt(proc.status.breakdown)); */
+        setText(`${process}-warning`,   fmt(proc.status.warning));
+
+        // EFFICIENCY
+        const eff = proc.efficiency || { day:0, night:0, average:0 };
+        setEff(process, 'day',   eff.day);
+        setEff(process, 'night', eff.night);
+        setEff(process, 'avg',   eff.average);
+
+        // OUTPUT
+        const out = proc.output || {
+          day:0, night:0, total:0,
+          day_lost_pcs:0, day_loss_percent:0,
+          night_lost_pcs:0, night_loss_percent:0,
+          total_lost_pcs:0, total_loss_percent:0
+        };
+        setText(`${process}-day-output`,   fmt(out.day));
+        setText(`${process}-night-output`, fmt(out.night));
+        setText(`${process}-total-output`, fmt(out.total));
+
+        // Lost blocks (ẩn nếu = 0)
+        // Xác định công đoạn trước để so sánh
+let prevKey = null;
+if (key === 'tuft') prevKey = 'mold';
+if (key === 'blister') prevKey = 'tuft';
+
+const prevOut = prevKey ? data[prevKey]?.output : null;
+const shouldHideLost =
+  prevOut && (
+    out.day   > (prevOut.day   || 0) ||
+    out.night > (prevOut.night || 0) ||
+    out.total > (prevOut.total || 0)
+  );
+
+// Hàm áp dụng hiển thị lost
+function applyLost(slot) {
+  const pcsId = `${process}-${slot}-lost-pcs`;
+  const pctId = `${process}-${slot}-lost-percent`;
+  const block = $id(`${process}-${slot}-lost`);
+
+  if (shouldHideLost) {
+    // ép hiển thị dấu "-"
+    setText(pcsId, '-');
+    setText(pctId, '-');
+    if (block) block.classList.remove('hidden');
+  } else {
+    const pcs = slot==='day'   ? out.day_lost_pcs
+             : slot==='night' ? out.night_lost_pcs
+             : out.total_lost_pcs;
+    const pct = slot==='day'   ? out.day_loss_percent
+             : slot==='night' ? out.night_loss_percent
+             : out.total_loss_percent;
+    setText(pcsId, fmt(pcs));
+    setText(pctId, clamp01(pct).toFixed(2));
+    if (block) block.classList.toggle('hidden', !(pcs > 0));
+  }
+}
+
+applyLost('day');
+applyLost('night');
+applyLost('total');
+
+
+      } catch (e) {
+        console.error(`Failed to update dashboard for process: ${process}`, e);
+      }
+    });
+  }
+
+    function applyMode(modalEl, process) {
+        modalEl.classList.remove('mode-mold', 'mode-tuft', 'mode-blister');
+        const mode = process === 'mold' ? 'mode-mold' : (process === 'tuft' ? 'mode-tuft' : 'mode-blister');
+        modalEl.classList.add(mode);
+
+        // Đổi nhãn cột ID
+        const idTh = modalEl.querySelector('th[data-col="id"]');
+        if (idTh) idTh.textContent = window.translationManager.translate((process === 'mold') ? 'Mold ID' : 'Machine ID');
+
+        // Đổi nhãn cột current
+        const currTh = modalEl.querySelector('th[data-col="current"]');
+        if (currTh) currTh.textContent = window.translationManager.translate(process === 'tuft' ? 'Output'
+            : process === 'blister' ? 'Cycle Count'
+            : 'Current Cycle')
+            ;
+        }
+
+        // format helper
+        function fmtInt(v){ const n = Number(v); return Number.isNaN(n) ? '' : Math.round(n).toLocaleString(); }
+        function fmtFixed(v,d=2){ const n = Number(v); return Number.isNaN(n) ? '' : n.toFixed(d); }
+    // === LOGIC ĐIỀU KHIỂN POPUP CHI TIẾT ===
+
+// Lấy các element của popup
+const detailsModal = document.getElementById('details-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const modalTitle = document.getElementById('modal-title');
+const modalTableBody = document.getElementById('modal-table-body');
+
+// Hàm để đóng popup
+function closeDetailsPopup() {
+    detailsModal.classList.add('hidden');
+}
+
+// Gán sự kiện cho nút đóng
+closeModalBtn.addEventListener('click', closeDetailsPopup);
+
+// Hàm chính: Mở popup, cập nhật tiêu đề và tải dữ liệu
+async function openDetailsPopup(processName, statusFilter = 'total') {
+  const isMold = processName === 'mold';
+  const isTuft = processName === 'tuft';
+  const isBlis = processName === 'blister';
+
+  // Đổi nhãn cột ID
+  const idCol = document.getElementById('details-col-id');
+  if (idCol) idCol.textContent = window.translationManager.translate(isMold ? 'Mold ID' : 'Machine ID');
+
+  // Ẩn/hiện 2 cột cavity theo process
+  const thMoldCav   = document.getElementById('details-col-mold-cavity');
+  const thActualCav = document.getElementById('details-col-actual-cavity');
+  const showCavities = isMold; // chỉ mold mới hiện
+  if (thMoldCav)   thMoldCav.style.display   = showCavities ? '' : 'none';
+  if (thActualCav) thActualCav.style.display = showCavities ? '' : 'none';
+
+  // Đổi nhãn cột "Current Cycle" theo process
+  const thCurrent = document.getElementById('details-col-current');
+  if (thCurrent) {
+    thCurrent.textContent = window.translationManager.translate(isMold ? 'Current Cycle' : (isTuft ? 'Output' : 'Cycle Count'));
+  }
+
+  // Tiêu đề popup
+  const capitalized = processName.charAt(0).toUpperCase() + processName.slice(1);
+  const labelMap = { total: 'All', running: 'Running', breakdown: 'Break Down', warning: 'Warning' };
+ 
+
+    let capitalize = window.translationManager.translate(capitalized);
+    let labelMapString = window.translationManager.translate(labelMap[statusFilter] || 'All');
+    console.log(labelMapString);
+    let modalTitleDashboard = capitalize + ' ' + window.translationManager.translate('Machine Details') + ' - '  + labelMapString;
+    document.querySelector("#modal-title").textContent = modalTitleDashboard;
+
+  /* modalTitle.textContent = `${capitalized} Machine Details – ${labelMap[statusFilter] || 'All'}`; */
+if (String(statusFilter).toLowerCase() === 'breakdown') {
+  // Mở modal nhưng KHÔNG load dữ liệu
+  detailsModal.classList.remove('hidden');
+  // Hiển thị cố định "No data"
+  modalTableBody.innerHTML = '<tr><td colspan="13" class="text-center p-4">No data</td></tr>';
+  return; // chặn không fetch API
+}
+  // Mở modal + loading
+  detailsModal.classList.remove('hidden');
+  modalTableBody.innerHTML = '<tr><td colspan="13" class="text-center p-4">Loading...</td></tr>';
+
+
+
+  try {
+    const url = `api.php?action=get_machine_details&process=${encodeURIComponent(processName)}&status=${encodeURIComponent(statusFilter)}&_=${Date.now()}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const machines = await res.json();
+
+    modalTableBody.innerHTML = '';
+
+    if (!Array.isArray(machines) || machines.length === 0) {
+      modalTableBody.innerHTML = '<tr><td colspan="13" class="text-center p-4">No data found for this filter.</td></tr>';
+      return;
+    }
+
+    machines.forEach(m => {
+      // Lấy giá trị cho cột "current" theo process
+      const currentVal = isMold
+        ? fmtFixed(m.current_cycle, 2)                        // Mold: cycle time
+        : (isTuft ? fmtInt(m.output ?? m.current_cycle)       // Tuft: output (pcs/min)
+                  : fmtInt(m.cyclecount ?? m.current_cycle)); // Blister: cyclecount (cycles/min)
+
+      // fallback cho efficiency / lost_time (phòng API chưa map)
+      const effVal  = pickNum(m.efficiency, m.live_efficiency, m.eff);
+      const lostVal = pickNum(m.lost_time, m.idle_breakdown, m.downtime_minutes, m.downtime);
+
+      // Ẩn 2 cột cavity ở tuft/blister
+      const tdMoldCavityStyle   = showCavities ? '' : 'display:none;';
+      const tdActualCavityStyle = showCavities ? '' : 'display:none;';
+
+      const row = document.createElement('tr');
+      row.className = 'border-b hover:bg-gray-100';
+      row.innerHTML = `
+        <td class="p-3 font-semibold">${m.mold_id ?? ''}</td>
+        <td class="p-3">${m.family ?? 'N/A'}</td>
+        <td class="p-3">${m.process ?? ''}</td>
+
+        <td class="p-3 text-center" style="${tdMoldCavityStyle}">${m.mold_cavity ?? ''}</td>
+        <td class="p-3 text-center" style="${tdActualCavityStyle}">${m.actual_cavity ?? ''}</td>
+
+        <td class="p-3 text-center">${fmtNum(m.capacity_per_hr)}</td>
+        <td class="p-3 text-center">${fmtFixed(effVal, 2)}%</td>
+
+        <td class="p-3 text-center">${currentVal}</td>
+
+        <td class="p-3 text-center">${fmtFixed(m.target, 2)}</td>
+        <td class="p-3 text-center">${fmtFixed(m.upper_limit, 2)}</td>
+        <td class="p-3 text-center">${fmtFixed(m.lower_limit, 2)}</td>
+        <td class="p-3 text-center">${fmtInt(m.total_lost_pcs)}</td>
+        <td class="p-3 text-center">${fmtInt(lostVal)} mins</td>
+      `;
+      modalTableBody.appendChild(row);
+    });
+
+    // Ẩn/hiện cột theo process (sau khi render rows)
+    const detailsModalEl = document.getElementById('details-modal') || detailsModal;
+    if (processName === 'mold') {
+    showColumnsByTitle(detailsModalEl, ['Mold Cavity', 'Actual Cavity']); // giữ nguyên cho mold
+    } else {
+    hideColumnsByTitle(detailsModalEl, ['Mold Cavity', 'Actual Cavity']); // ẩn cả th & td cho tuft/blister
+    }
+
+  } catch (err) {
+    console.error('Failed to fetch machine details:', err);
+    modalTableBody.innerHTML = '<tr><td colspan="13" class="text-center p-4 text-red-500">Failed to load data. Please try again.</td></tr>';
+  }
+
+  // helpers
+  function pickNum(...vals) {
+    for (const v of vals) {
+      const n = Number(v);
+      if (!Number.isNaN(n) && v !== null && v !== undefined) return n;
+    }
+    return 0;
+  }
+  function fmtNum(v)   { const n = Number(v); return Number.isNaN(n) ? '' : n.toLocaleString(); }
+  function fmtFixed(v, d=2) { const n = Number(v); return Number.isNaN(n) ? '' : n.toFixed(d); }
+  function fmtInt(v)   { const n = Number(v); return Number.isNaN(n) ? '' : Math.round(n).toLocaleString(); }
+}
+
+
+// === LOGIC MỚI HOÀN TOÀN CHO POPUP EFFICIENCY ===
+const effModal = document.getElementById('efficiency-table-modal');
+const closeEffBtn = document.getElementById('close-efficiency-table-modal-btn');
+const effModalTitle = document.getElementById('efficiency-table-modal-title');
+const effModalBody = document.getElementById('efficiency-table-modal-body');
+const effSearchBtn = document.getElementById('eff-modal-search-btn');
+const effFromDate = document.getElementById('eff-from-date');
+const effToDate = document.getElementById('eff-to-date');
+
+
+let currentEffProcess = 'mold';
+let currentEffSortBy = 'machine_id';
+let currentEffSortOrder = 'ASC';
+let currentEffSlot = 'avg'; // Mặc định là 'avg', có thể thay đổi thành 'day' hoặc 'night' khi cần 
+
+
+// Tạo 1 "thẻ pie" HTML
+function buildPieCard(title, idPrefix) {
+  return `
+    <div class="efficiency-item text-center">
+      <h4 class="font-semibold">${title}</h4>
+      <div id="${idPrefix}-pie" class="pie mt-1" style="--p:0;">
+        <span id="${idPrefix}-val">0%</span>
+      </div>
+    </div>`;
+}
+
+// Vẽ 3 pie (Molding/Tufting/Blistering) theo 1 slot
+function renderTopPies(slot) {
+  const container = document.getElementById('eff-top-pies'); // nhớ đã thay block HTML như mình nói
+  const titleMap = {
+    day: '07:00 ~ 19:00',
+    night: '19:00 ~ 07:00',
+    avg: window.translationManager.translate('Average')
+  };
+  let moldLabel = '(' + window.translationManager.translate('Molding') + ')';
+  let tuftLabel = '(' + window.translationManager.translate('Tufting') + ')';
+  let blisterLabel = '(' + window.translationManager.translate('Blistering')+ ')';
+  container.innerHTML = `
+    ${buildPieCard(`${titleMap[slot]} ${moldLabel}`, 'top-mold')}
+    ${buildPieCard(`${titleMap[slot]} ${tuftLabel}`, 'top-tuft')}
+    ${buildPieCard(`${titleMap[slot]} ${blisterLabel}`, 'top-blister')}
+  `;
+}
+
+// Trả về khoảng thời gian theo slot
+function getTimeRangeBySlot(slot) {
+  const now = new Date();
+  // mốc 07:00 hôm nay & hôm qua (LOCAL)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const today_07 = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0);
+  const yday_07  = new Date(today_07.getTime() - 24*60*60*1000);
+  const yday_19  = new Date(today_07.getFullYear(), today_07.getMonth(), today_07.getDate()-1, 19, 0, 0);
+
+  if (slot === 'day')   return { from: yday_07, to: yday_19 };   // 07:00 hôm qua -> 19:00 hôm qua
+  if (slot === 'night') return { from: yday_19, to: today_07 };  // 19:00 hôm qua -> 07:00 hôm nay
+  // avg (business day 24h)
+  return { from: yday_07, to: today_07 };                        // 07:00 hôm qua -> 07:00 hôm nay
+}
+
+// Gọi API cho 1 process để lấy dữ liệu efficiency report
+async function fetchEffOne(process, fromStr, toStr) {
+  const url = `api.php?action=get_efficiency_report_data&process=${process}&from=${fromStr}&to=${toStr}&sort_by=${currentEffSortBy}&sort_order=${currentEffSortOrder}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+
+
+// Đổi tên hàm này để nhất quán
+function closeEfficiencyTablePopup() {
+    effModal.classList.add('hidden');
+}
+
+/* async function openEfficiencyTablePopup(processName) {
+    const effModalEl = document.getElementById('efficiency-table-modal');
+    applyMode(effModalEl, currentEffProcess);
+
+    currentEffProcess = processName;
+
+    const effIdCol = document.getElementById('efficiency-col-id');
+  if (effIdCol) effIdCol.textContent =  window.translationManager.translate((processName === 'mold') ? 'Mold ID' : 'Machine ID');
+  
+    const capitalized = processName.charAt(0).toUpperCase() + processName.slice(1);
+    effModalTitle.textContent = `${capitalized} Efficiency Report`;
+    
+    console.log(capitalized);
+
+
+    effModal.classList.remove('hidden');
+    await searchEfficiencyData();
+} */
+// Hàm chuyển đổi định dạng ngày giờ từ "YYYY-MM-DD HH:mm" sang "YYYY-MM-DD HH:mm:00"
+    function toApi(dtHHmm) {
+    if (!dtHHmm) return '';
+    return dtHHmm.replace('T', ' ') + ':00';
+    }
+
+async function searchEfficiencyData() {
+  effModalBody.innerHTML = `<tr><td colspan="7" class="text-center p-4">Loading...</td></tr>`;
+
+  // 1) Range theo DATEPICKER của popup
+  const fromStr = toApi(document.getElementById('eff-from-date').value); // "YYYY-MM-DD HH:mm:00"
+  const toStr   = toApi(document.getElementById('eff-to-date').value);
+
+  // Bật sort cho bảng chi tiết
+  setupTableSorting('#efficiency-table-modal table');
+
+  try {
+    /* ================== A) BẢNG CHI TIẾT ================== */
+    const data = await fetchEffOne(currentEffProcess, fromStr, toStr);
+
+    const details = data?.details || [];
+    effModalBody.innerHTML = '';
+    if (!details.length) {
+      effModalBody.innerHTML = `<tr><td colspan="7" class="text-center p-4">No data found.</td></tr>`;
+    } else {
+      details.forEach(machine => {
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50';
+
+        const currentCellValue =
+          currentEffProcess === 'mold'
+            ? fmtFixed(machine.current_cycle || 0, 2)
+            : currentEffProcess === 'tuft'
+              ? fmtInt(machine.output ?? machine.current_cycle)
+              : fmtInt(machine.cyclecount ?? machine.current_cycle);
+
+        row.innerHTML = `
+          <td data-col="id"            class="p-3 font-semibold">${machine.machine_id}</td>
+          <td data-col="family"        class="p-3">${machine.family || 'N/A'}</td>
+          <td data-col="process"       class="p-3">${machine.process}</td>
+          <td data-col="mold_cavity"   class="p-3">${machine.mold_cavity || 0}</td>
+          <td data-col="actual_cavity" class="p-3">${Math.round(machine.actual_cavity || 0)}</td>
+          <td data-col="capacity"      class="p-3">${(machine.capacity || 0).toLocaleString()}</td>
+          <td data-col="output"        class="p-3">${fmtInt(machine.output)}</td>
+          <td data-col="efficiency"    class="p-3 font-bold">${fmtFixed(machine.efficiency || 0, 2)}%</td>
+          <td data-col="current"       class="p-3">${currentCellValue}</td>
+          <td class="p-3">${(machine.target || 0).toFixed(2)}</td>
+          <td class="p-3">${(machine.upper_limit || 0).toFixed(2)}</td>
+          <td class="p-3">${(machine.lower_limit || 0).toFixed(2)}</td>
+          <td class="p-3">${Math.round(machine.total_lost_pcs || 0).toLocaleString()}</td>
+          <td class="p-3">${Math.round(machine.lost_time || 0).toLocaleString()} mins</td>
+        `;
+        effModalBody.appendChild(row);
+      });
+
+      // Ẩn/hiện cột cavity theo process
+      const effModalEl = document.getElementById('efficiency-table-modal') || effModal;
+      if (currentEffProcess === 'mold') {
+        showColumnsByTitle(effModalEl, ['Mold Cavity', 'Actual Cavity']);
+      } else {
+        hideColumnsByTitle(effModalEl, ['Mold Cavity', 'Actual Cavity']);
+      }
+
+      // Sort mặc định theo efficiency (tăng dần)
+      sortOnce('#efficiency-table-modal table', 'efficiency', 'asc');
+    }
+    // ==================  3 PIE TOP ==================
+    if (typeof renderTopPies === 'function') renderTopPies(currentEffSlot);
+    setPopupPiesFromSummary(data, currentEffSlot);
+
+      } catch (error) {
+        console.error('Failed to fetch efficiency report data:', error);
+        effModalBody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500">Failed to load data.</td></tr>`;
+      }
+    }
+
+
+function setupTableSorting(table) {
+  const tbl = typeof table === 'string' ? document.querySelector(table) : table;
+  if (!tbl || !tbl.tHead || !tbl.tBodies.length) return;
+
+  const ths = Array.from(tbl.tHead.querySelectorAll('th'));
+
+  ths.forEach((th, colIdx) => {
+    th.classList.add('cursor-pointer','select-none','whitespace-nowrap');
+    if (th.dataset.sortBound) return; // tránh bind 2 lần
+    th.dataset.sortBound = '1';
+
+    const icon = document.createElement('span');
+    icon.className = 'ml-1 text-gray-400';
+    th.appendChild(icon);
+
+    th.addEventListener('click', () => {
+      const order = th.dataset.order === 'asc' ? 'desc' : 'asc';
+
+      ths.forEach(h => {
+        h.dataset.order = '';
+        const i = h.querySelector('span');
+        if (i) i.textContent = '';
+        h.classList.remove('text-blue-600');
+      });
+      th.dataset.order = order;
+      icon.textContent = order === 'asc' ? '▲' : '▼';
+      th.classList.add('text-blue-600');
+
+      const tbody = tbl.tBodies[0];
+      const rows = Array.from(tbody.rows).map((tr, i) => ({ tr, i }));
+      const numeric = detectNumericColumn(tbody.rows, colIdx);
+
+      rows.sort((a, b) => {
+        const va = getCell(a.tr, colIdx, numeric);
+        const vb = getCell(b.tr, colIdx, numeric);
+
+        if (va.null && vb.null) return a.i - b.i;
+        if (va.null) return 1;
+        if (vb.null) return -1;
+
+        let cmp;
+        if (numeric) cmp = va.val - vb.val;
+        else cmp = va.val < vb.val ? -1 : (va.val > vb.val ? 1 : 0);
+
+        if (cmp === 0) return a.i - b.i; // stable sort
+        return order === 'asc' ? cmp : -cmp;
+      });
+
+      const frag = document.createDocumentFragment();
+      rows.forEach(({tr}) => frag.appendChild(tr));
+      tbody.appendChild(frag);
+    });
+  });
+
+  function detectNumericColumn(rows, colIdx) {
+    let numericCount = 0, total = 0;
+    for (const tr of rows) {
+      const t = (tr.cells[colIdx]?.textContent || '').trim();
+      if (t !== '') {
+        total++;
+        if (!Number.isNaN(parseNumeric(t))) numericCount++;
+      }
+    }
+    return numericCount >= Math.max(1, total * 0.6); // ≥60% parse được số => xem là số
+  }
+
+  function parseNumeric(text) {
+    let t = text.replace(/,/g, '').trim();
+    if (t.endsWith('%')) t = t.slice(0, -1).trim();               // "95.2%"
+    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(t)) {                      // "h:mm[:ss]"
+      const [h, m, s='0'] = t.split(':').map(Number);
+      return h*3600 + m*60 + s;
+    }
+    const n = parseFloat(t);                                       // "123 mins" -> 123
+    return Number.isNaN(n) ? NaN : n;
+  }
+
+  function getCell(tr, colIdx, numeric) {
+    const raw = (tr.cells[colIdx]?.textContent || '').trim();
+    if (raw === '') return { val: null, null: true };
+    if (numeric) {
+      const n = parseNumeric(raw);
+      if (Number.isNaN(n)) return { val: null, null: true };
+      return { val: n, null: false };
+    }
+    return { val: raw.toLowerCase(), null: false };
+  }
+}
+
+function sortOnce(tableSelector, headerMatcher, desired='asc') {
+  const tbl = document.querySelector(tableSelector);
+  if (!tbl || !tbl.tHead || !tbl.tBodies.length) return;
+
+  // đảm bảo đã bind
+  setupTableSorting(tbl);
+
+  // lấy hàng thead cuối
+  const headRow = tbl.tHead.rows[tbl.tHead.rows.length - 1];
+  const ths = Array.from(headRow.cells);
+
+  // tìm cột theo tiêu đề (hoặc số index)
+  const idx = (typeof headerMatcher === 'number')
+    ? headerMatcher
+    : ths.findIndex(th =>
+        (th.textContent || '').trim().toLowerCase().includes(
+          String(headerMatcher).toLowerCase()
+        )
+      );
+  if (idx < 0) return;
+
+  // đặt trạng thái ngược lại để click ra đúng chiều mong muốn
+  ths[idx].dataset.order = (desired === 'asc') ? 'desc' : 'asc';
+  ths[idx].click();
+}
+
+const tbl = document.querySelector('#efficiency-modal table'); // chỉnh selector đúng với popup của bạn
+if (tbl && tbl.tHead) {
+  const ths = Array.from(tbl.tHead.querySelectorAll('th'));
+  const effIdx = ths.findIndex(th =>
+    (th.textContent || '').trim().toLowerCase().startsWith('efficiency')
+  );
+  if (effIdx >= 0) {
+    // Lần 1: từ '' -> 'asc' (mặc định tăng dần)
+    ths[effIdx].click();
+  }
+}
+
+// Gán sự kiện, sử dụng đúng tên biến và tên hàm đã định nghĩa ở trên
+closeEffBtn.addEventListener('click', closeEfficiencyTablePopup);
+effSearchBtn.addEventListener('click', searchEfficiencyData);
+/* document.querySelectorAll('#efficiency-table-modal th[data-sort]').forEach(header => {
+    header.addEventListener('click', () => {
+        const sortBy = header.getAttribute('data-sort');
+        currentEffSortOrder = (currentEffSortBy === sortBy && currentEffSortOrder === 'ASC') ? 'DESC' : 'ASC';
+        currentEffSortBy = sortBy;
+        searchEfficiencyData();
+    });
+}); */
+
+// === LOGIC MỚI CHO POPUP OUTPUT ===
+const outputModal = document.getElementById('output-modal');
+const closeOutputBtn = document.getElementById('close-output-modal-btn');
+const outputModalTitle = document.getElementById('output-modal-title');
+const outputModalBody = document.getElementById('output-table-modal-body');
+const outputSearchBtn = document.getElementById('output-modal-search-btn');
+const outputFamilyFilter = document.getElementById('output-family-filter');
+
+let currentOutputProcess = 'mold';
+
+function closeOutputPopup() {
+    outputModal.classList.add('hidden');
+}
+
+function formatDateForAPI(date) {
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // getMonth() trả về 0–11
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+// Định dạng "YYYY-MM-DD HH:mm:ss" theo GIỜ LOCAL (KHÔNG toISOString)
+function formatLocalYmdHms(d) {
+  const pad = n => String(n).padStart(2, '0');
+  return [
+    d.getFullYear(),
+    pad(d.getMonth() + 1),
+    pad(d.getDate())
+  ].join('-') + ' ' +
+  [pad(d.getHours()), pad(d.getMinutes()), pad(d.getSeconds())].join(':');
+}
+
+//hàm ẩn các tiêu đề không cần thiết trong modal
+function hideHeadersByTitle(modalEl, titles){
+  const ths = Array.from(modalEl.querySelectorAll('thead th'));
+  ths.forEach(th => {
+    const txt = th.textContent.trim().toLowerCase();
+    if (titles.includes(txt)) th.style.display = 'none';
+  });
+}
+// helper: hiện/ẩn cột theo tiêu đề (áp dụng cho th và các td cùng cột)
+function toggleHeadersByTitle(modalEl, titles = [], show = true) {
+  const ths = Array.from(modalEl.querySelectorAll('thead th'));
+  const map = new Map();
+  ths.forEach((th, idx) => map.set(th.textContent.trim().toLowerCase(), idx));
+
+  titles.forEach(t => {
+    const key = String(t).trim().toLowerCase();
+    if (!map.has(key)) return;
+    const colIdx = map.get(key);
+
+    // th
+    const th = ths[colIdx];
+    if (th) th.style.display = show ? '' : 'none';
+
+    // tất cả td của cột
+    modalEl.querySelectorAll(`tbody tr`).forEach(tr => {
+      const tds = tr.children;
+      if (tds[colIdx]) tds[colIdx].style.display = show ? '' : 'none';
+    });
+  });
+}
+
+async function openOutputPopup(processName, event) {
+  const isMold = processName === 'mold';
+  const isTuft = processName === 'tuft';
+  const isBlis = processName === 'blister';
+
+  // flags dùng cho searchOutputData
+  window.currentOutputProcess = processName;
+  window.outputCurrentKey = isMold ? 'current_cycle' : (isTuft ? 'output' : 'cyclecount');
+
+  // tiêu đề popup
+  const capitalized = processName.charAt(0).toUpperCase() + processName.slice(1);
+  outputModalTitle.textContent =  window.translationManager.translate(capitalized) + ' ' + window.translationManager.translate('Output Report');
+
+  // đổi nhãn cột ID + cột "current"
+  const idTh  = document.getElementById('output-col-id');
+  if (idTh) idTh.textContent =  window.translationManager.translate(isMold ? 'Mold ID' : 'Machine ID');
+  const curTh = document.getElementById('output-col-current');
+  if (curTh) curTh.textContent = window.translationManager.translate(isMold ? 'Current Cycle' : (isTuft ? 'Output' : 'Cycle Count'));
+
+  // reset hiển thị 4 cột rồi ẩn theo process (CHỈ data-col)
+  toggleColumnsByDataCol(outputModal, ['mold_cavity','actual_cavity','lost_pcs','lost_time'], true);
+  if (isMold) {
+    toggleColumnsByDataCol(outputModal, ['lost_pcs','lost_time'], false);      // mold: ẩn lost*
+  } else {
+    toggleColumnsByDataCol(outputModal, ['mold_cavity','actual_cavity'], false); // tuft/blister: ẩn cavity
+  }
+
+  // mở modal + load families
+  outputModal.classList.remove('hidden');
+  outputFamilyFilter.innerHTML = '<option value="" data-translate="Loading families..." >Loading families...</option>';
+  try {
+    const familyRes = await fetch(`api.php?action=get_families&process=${encodeURIComponent(processName)}`);
+    const families = await familyRes.json();
+    outputFamilyFilter.innerHTML = '<option value="" data-translate="All Families" >All Families</option>';
+    families.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f; opt.textContent = f;
+      outputFamilyFilter.appendChild(opt);
+    });
+  } catch (e) {
+    console.error('Failed to load families:', e);
+    outputFamilyFilter.innerHTML = '<option value="">Error loading</option>';
+  }
+
+  // thời gian theo ô click
+  const clickedTd = event.currentTarget || event.target.closest('td');
+  const clickedId = clickedTd?.id || '';
+  const today = new Date();
+  let from, to;
+  if (/_output_7-9$/.test(clickedId)) {
+    from = new Date(today.getFullYear(), today.getMonth(), today.getDate()-1, 7, 0, 0);
+    to   = new Date(today.getFullYear(), today.getMonth(), today.getDate()-1, 19, 0, 0);
+  } else if (/_output_9-7$/.test(clickedId)) {
+    from = new Date(today.getFullYear(), today.getMonth(), today.getDate()-1, 19, 0, 0);
+    to   = new Date(today.getFullYear(), today.getMonth(), today.getDate(),   7, 0, 0);
+  } else {
+    // total 24h 07->07
+    from = new Date(today.getFullYear(), today.getMonth(), today.getDate()-1, 7, 0, 0);
+    to   = new Date(today.getFullYear(), today.getMonth(), today.getDate(),   7, 0, 0);
+  }
+
+  // set picker + tải dữ liệu
+  outputFromPicker.setDate(from, false);
+  outputToPicker.setDate(to, false);
+  console.log('[openOutputPopup] process=', processName);
+  await searchOutputData(formatDateForAPI(from), formatDateForAPI(to));
+}
+
+
+
+
+async function searchOutputData(fromday, today) {
+  outputModalBody.innerHTML = `<tr><td colspan="15" class="text-center p-4">Loading...</td></tr>`;
+
+  const fromInput = document.getElementById('output-from-date').value;
+  const toInput   = document.getElementById('output-to-date').value;
+  const fromdate  = fromday || fromInput;
+  const todate    = today   || toInput;
+  const family    = outputFamilyFilter.value;
+
+  try {
+    const proc   = window.currentOutputProcess; // 👈 dùng duy nhất biến global
+    const apiUrl = `api.php?action=get_output_report&process=${proc}&from=${fromdate}:00&to=${todate}:00&family=${encodeURIComponent(family)}&_=${Date.now()}`;
+    console.log('[searchOutputData] url=', apiUrl);
+
+    const response = await fetch(apiUrl, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+
+    // Summary
+    const s = data.summary || {};
+    const pct = v => (Number(v) || 0).toFixed(1);
+    document.getElementById('output-summary-day').textContent        = num(s.day_output);
+    document.getElementById('output-summary-day-lost').textContent   = `${num(s.day_lost)} (${pct(s.day_loss_percent)}%)`;
+    document.getElementById('output-summary-night').textContent      = num(s.night_output);
+    document.getElementById('output-summary-night-lost').textContent = `${num(s.night_lost)} (${pct(s.night_loss_percent)}%)`;
+    document.getElementById('output-summary-total').textContent      = num(s.total_output);
+    document.getElementById('output-summary-total-lost').textContent = `${num(s.total_lost)} (${pct(s.total_loss_percent)}%)`;
+
+    const details = data.details || [];
+    outputModalBody.innerHTML = '';
+
+    if (!details.length) {
+      outputModalBody.innerHTML = `<tr><td colspan="15" class="text-center p-4">No data found for the selected criteria.</td></tr>`;
+      applyOutputColumnVisibility();
+      return;
+    }
+
+    const familyShown  = {};
+    const familyCounts = data.family_counts || {};
+
+    // debug nhanh: xem các key liên quan lost/downtime
+    console.table(details.slice(0,5).map(d => ({
+      id: d.machine_id,
+      keys: Object.keys(d).filter(k => /lost|idle|down/i.test(k)).join(', '),
+      total_lost_pcs: d.total_lost_pcs,
+      lost_time: d.lost_time
+    })));
+
+    details.forEach(item => {
+      // Giá trị "current" theo process
+      const currentVal =
+        (proc === 'mold')    ? fix(firstNum(item.current_cycle, item.cycle_time), 2) :
+        (proc === 'tuft')    ? num(Math.round(firstNum(item.output, item.current, item.current_cycle))) :
+                               num(Math.round(firstNum(item.cyclecount, item.current, item.current_cycle)));
+
+      // Lấy lost pcs/time với fallback tên khóa
+      const lostPcsVal  = firstNum(
+        item.total_lost_pcs,  // alias chuẩn
+        item.loss_pcs,        // tên cũ hay gặp
+        item.lost_pcs,
+        item.loss,
+        item.lost
+      );
+      const lostTimeVal = firstNum(
+        item.lost_time,        // alias chuẩn (phút)
+        item.idle_breakdown,   // tên cũ thường là phút downtime
+        item.downtime_minutes,
+        item.downtime
+      );
+
+      // Subtotal theo family
+      let subtotalCell = '';
+      if (!familyShown[item.family]) {
+        const rowspan = familyCounts[item.family] || 1;
+        subtotalCell  = `<td class="p-3 font-bold text-green-700" data-col="subtotal" rowspan="${rowspan}">${num(item.subtotal ?? 0)}</td>`;
+        familyShown[item.family] = 1;
+      } else {
+        familyShown[item.family]++;
+      }
+
+      const row = document.createElement('tr');
+      row.className = 'border-b hover:bg-gray-50';
+      row.innerHTML = `
+        <td class="p-3" data-col="id">${item.machine_id ?? ''}</td>
+        <td class="p-3" data-col="family">${item.family ?? ''}</td>
+        <td class="p-3" data-col="process">${item.process || 'N/A'}</td>
+
+        <td class="p-3" data-col="mold_cavity">${item.mold_cavity ?? 0}</td>
+        <td class="p-3" data-col="actual_cavity">${Math.round(item.actual_cavity || 0)}</td>
+
+        <td class="p-3" data-col="capacity">${num(item.capacity || 0)}</td>
+        <td class="p-3 font-bold text-blue-600" data-col="output">${num(Math.round(firstNum(item.output, 0)))}</td>
+        ${subtotalCell}
+        <td class="p-3" data-col="efficiency">${fix(firstNum(item.efficiency, 0), 2)}%</td>
+
+        <td class="p-3" data-col="current">${currentVal}</td>
+
+        <td class="p-3" data-col="target">${fix(firstNum(item.target, 0), 2)}</td>
+        <td class="p-3" data-col="upper">${fix(firstNum(item.upper_limit, 0), 2)}</td>
+        <td class="p-3" data-col="lower">${fix(firstNum(item.lower_limit, 0), 2)}</td>
+        <td class="p-3" data-col="lost_pcs">${num(Math.round(lostPcsVal))}</td>
+        <td class="p-3" data-col="lost_time">${num(Math.round(lostTimeVal))} mins</td>
+      `;
+      outputModalBody.appendChild(row);
+    });
+
+    // Ẩn/hiện cột sau khi render
+    applyOutputColumnVisibility();
+
+  } catch (error) {
+    console.error('Failed to fetch output report data:', error);
+    outputModalBody.innerHTML = `<tr><td colspan="15" class="text-center p-4 text-red-500">Failed to load data.</td></tr>`;
+    applyOutputColumnVisibility();
+  }
+
+  function applyOutputColumnVisibility() {
+    const proc = window.currentOutputProcess; // 👈 dùng global
+    // reset: hiện tất cả
+    toggleColumnsByDataCol(outputModal, ['mold_cavity','actual_cavity','lost_pcs','lost_time'], true);
+    if (proc === 'mold') {
+      toggleColumnsByDataCol(outputModal, ['lost_pcs','lost_time'], false);
+    } else {
+      toggleColumnsByDataCol(outputModal, ['mold_cavity','actual_cavity'], false);
+    }
+  }
+
+  function firstNum(...vals) {
+    for (const v of vals) {
+      const n = Number(v);
+      if (v !== null && v !== undefined && !Number.isNaN(n)) return n;
+    }
+    return 0;
+  }
+  function num(v){ const n=Number(v); return Number.isNaN(n)?'':n.toLocaleString(); }
+  function fix(v,d=2){ const n=Number(v); return Number.isNaN(n)?'':n.toFixed(d); }
+}
+
+
+
+
+
+
+// Gán sự kiện
+closeOutputBtn.addEventListener('click', closeOutputPopup);
+outputSearchBtn.addEventListener('click', () => {
+    searchOutputData(); // không truyền gì => hàm sẽ dùng fromInput, toInput
+});
+
+        window.openDetailsPopup = openDetailsPopup;
+        window.openEfficiencyTablePopup = openEfficiencyTablePopup;
+        window.openOutputPopup = openOutputPopup;
+
+let isPolling = false;
+async function safePoll() {
+  if (isPolling) return;
+  isPolling = true;
+  try { await fetchAndCombineData(); }
+  catch(e){ console.error('poll failed:', e); }
+  finally { isPolling = false; }
+}
+safePoll();
+setInterval(safePoll, 15000); // 15s/lần
+
+
+        // Khởi chạy các hàm ban đầu
+        updateDateTime();
+        safePoll();                   // gọi 1 lần khi load
+        setInterval(safePoll, 15000); // 15s/lần cho nhẹ máy
+        async function pollOnce() {
+  try {
+    // Hủy request cũ nếu còn treo
+    if (pollCtl) pollCtl.abort();
+    pollCtl = new AbortController();
+
+    await fetchAndCombineData({ signal: pollCtl.signal });
+  } catch (e) {
+    console.warn('poll error:', e.message || e);
+  } finally {
+    setTimeout(pollOnce, 15000); // 15s là hợp lý; nếu nhẹ có thể 10s
+  }
+}
+pollOnce();
+
+        const flatpickrConfig = {
+        enableTime: true,       
+        time_24hr: true,        
+        dateFormat: "Y-m-d H:i", 
+        altInput: true,         
+        altFormat: "d/m/Y H:i",  
+
+        plugins: [
+        new confirmDatePlugin({
+            confirmText: "OK",      
+            showAlways: true,       
+            theme: "light"          
+        })
+    ]
+    };
+
+    const fromPicker = flatpickr("#eff-from-date", flatpickrConfig);
+    const toPicker = flatpickr("#eff-to-date", flatpickrConfig);
+    const outputFromPicker = flatpickr("#output-from-date", flatpickrConfig);
+    const outputToPicker = flatpickr("#output-to-date", flatpickrConfig);
+
+
+    const menuButton = document.getElementById('menu-button');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    // Mở/đóng menu khi nhấn vào nút
+    menuButton.addEventListener('click', function (event) {
+        event.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Đóng menu khi nhấn ra ngoài
+    window.addEventListener('click', function (event) {
+        if (!menuButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+    async function openEfficiencyTablePopup(processName, slot = 'avg') {
+        currentEffProcess = processName; // bảng chi tiết vẫn theo process mà bạn click
+        currentEffSlot = slot;
+
+        const capitalized = processName.charAt(0).toUpperCase() + processName.slice(1);
+        effModalTitle.textContent = window.translationManager.translate(capitalized) + ' ' + window.translationManager.translate('Efficiency Report');
+
+        // Đổi tiêu đề cột đầu tiên theo process
+        document.getElementById('efficiency-col-id').textContent =
+             window.translationManager.translate((processName === 'mold') ? 'Mold ID' : 'Machine ID');
+
+
+        // Set khoảng thời gian đúng theo slot
+        const { from, to } = getTimeRangeBySlot(slot);
+        fromPicker.setDate(from, false);
+        toPicker.setDate(to, false);
+
+        // Vẽ 3 pie trên cùng cho cả 3 process
+        renderTopPies(slot);
+
+        effModal.classList.remove('hidden');
+
+        // Tải dữ liệu: bảng chi tiết + cập nhật 3 pie
+        await searchEfficiencyData();
+        }
+    
+        // Tìm cột theo tiêu đề (không phân biệt hoa/thường) rồi ẩn/hiện cả th + td
+        function hideColumnsByTitle(modalEl, titles = []) {
+        if (!modalEl) return;
+        const want = titles.map(t => String(t).trim().toLowerCase());
+        const ths  = Array.from(modalEl.querySelectorAll('thead th'));
+
+        // xác định index các cột cần ẩn
+        const idxToHide = [];
+        ths.forEach((th, i) => {
+            const key = th.textContent.trim().toLowerCase();
+            if (want.includes(key)) {
+            th.style.display = 'none';      // ẩn header
+            idxToHide.push(i);
+            } else {
+            th.style.display = '';          // hiện lại nếu lần trước bị ẩn
+            }
+        });
+
+        // ẩn tất cả td theo index
+        modalEl.querySelectorAll('tbody tr').forEach(tr => {
+            idxToHide.forEach(i => {
+            const td = tr.children[i];
+            if (td) td.style.display = 'none';
+            });
+        });
+        }
+
+        function showColumnsByTitle(modalEl, titles = []) {
+        if (!modalEl) return;
+        const want = titles.map(t => String(t).trim().toLowerCase());
+        const ths  = Array.from(modalEl.querySelectorAll('thead th'));
+        const idxToShow = [];
+
+        ths.forEach((th, i) => {
+            const key = th.textContent.trim().toLowerCase();
+            if (want.includes(key)) {
+            th.style.display = ''; // hiện lại header
+            idxToShow.push(i);
+            }
+        });
+
+        modalEl.querySelectorAll('tbody tr').forEach(tr => {
+            idxToShow.forEach(i => {
+            const td = tr.children[i];
+            if (td) td.style.display = '';
+            });
+        });
+        }
+
+    });
+
+    function toggleColumnsByDataCol(modalEl, cols = [], show = true) {
+        if (!modalEl) return;
+        cols.forEach(col => {
+            modalEl.querySelectorAll(`thead th[data-col="${col}"]`).forEach(el => el.style.display = show ? '' : 'none');
+            modalEl.querySelectorAll(`tbody td[data-col="${col}"]`).forEach(el => el.style.display = show ? '' : 'none');
+        });
+        }
+    
+    </script>
+    <div id="details-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-8xl max-h-full overflow-y-auto">
+        <div class="flex justify-between items-center border-b p-4">
+            <h2 id="modal-title" class="text-2xl font-bold">Machine Details</h2>
+            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+
+        <div class="p-6">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b-2 bg-gray-50">
+                        <th data-col="id" id="details-col-id" class="p-3 text-sm font-semibold" >Mold' ID</th>
+                        <th data-col="family" class="p-3 text-sm font-semibold">Family</th>
+                        <th data-col="process" class="p-3 text-sm font-semibold">Process</th>
+                        <th data-col="mold_cavity" class="p-3 text-sm font-semibold">Mold Cavity</th>
+                        <th data-col="actual_cavity" class="p-3 text-sm font-semibold">Actual Cavity</th>
+                        <th data-col="capacity" class="p-3 text-sm font-semibold">Capacity / hr</th>
+                        <th data-col="output" class="p-3 text-sm font-semibold">Efficiency</th>
+                        <th data-col="current" id="details-col-current" class="p-3 text-sm font-semibold">Current Cycle</th>
+                        <th data-col="target class="p-3 text-sm font-semibold" data-translate="Target">Target</th>
+                        <th data-col="upper" class="p-3 text-sm font-semibold">Upper Limit</th>
+                        <th data-col="lower" class="p-3 text-sm font-semibold">Lower Limit</th>
+                        <th data-col="lostpcs"  class="p-3 text-sm font-semibold">Total lost pcs</th>
+                        <th data-col="losttime" class="p-3 text-sm font-semibold">Lost time</th>
+                    </tr>
+                </thead>
+                <tbody id="modal-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="efficiency-table-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-8xl max-h-full overflow-y-auto">
+        <div class="flex justify-between items-center border-b p-4">
+            <h2 id="efficiency-table-modal-title" class="text-2xl font-bold">Efficiency Report</h2>
+            <button id="close-efficiency-table-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+
+        <div class="p-6">
+            <div class="flex flex-wrap md:flex-nowrap gap-6 mb-6">
+                <div id="eff-top-pies" class="w-full md:w-2/4 flex justify-around items-center p-4 border rounded-md bg-gray-50"></div>
+                <div class="w-full md:w-2/4 flex items-end gap-4 p-4 border rounded-md bg-gray-50">
+                    <div class="flex-grow">
+                        <label for="eff-from-date" class="block text-sm font-medium text-gray-700" data-translate="From dateline">From date</label>
+                        <input type="datetime-local" id="eff-from-date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+
+                        <label for="eff-to-date" class="block text-sm font-medium text-gray-700" data-translate="To dateline">To date</label>
+                        <input type="datetime-local" id="eff-to-date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <button id="eff-modal-search-btn" class="h-10 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        SEARCH
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b-2 bg-gray-50">
+                            <th data-col="id" id="efficiency-col-id" class="p-3 text-sm font-semibold">Mold ID</th>
+                            <th data-col="family" class="p-3 text-sm font-semibold">Family</th>
+                            <th data-col="process" class="p-3 text-sm font-semibold">Process</th>
+                            <th data-col="mold_cavity" class="p-3 text-sm font-semibold">Mold Cavity</th>
+                            <th data-col="actual_cavity" class="p-3 text-sm font-semibold">Actual Cavity</th>
+                            <th data-col="capacity" class="p-3 text-sm font-semibold">Capacity</th>
+                            <th data-col="output" class="p-3 text-sm font-semibold">Output</th>
+                            <th data-col="efficiency" class="p-3 text-sm font-semibold">Efficiency</th>
+                            <th data-col="current" id="efficiency-col-current" class="p-3 text-sm font-semibold">Current Cycle</th>
+                            <th data-col="target" class="p-3 text-sm font-semibold" data-translate="Target">Target</th>
+                            <th data-col="upper" class="p-3 text-sm font-semibold">Upper Limit</th>
+                            <th data-col="lower" class="p-3 text-sm font-semibold">Lower Limit</th>
+                            <th data-col="lostpcs" class="p-3 text-sm font-semibold">Total lost pcs</th>
+                            <th data-col="losttime" class="p-3 text-sm font-semibold">Lost time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="efficiency-table-modal-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="output-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-8xl max-h-full flex flex-col">
+        <div class="flex-shrink-0 flex justify-between items-center border-b p-4">
+            <h2 id="output-modal-title" class="text-2xl font-bold">Output Report</h2>
+            <button id="close-output-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+
+        <div class="flex-grow p-6 overflow-y-auto">
+            <div class="flex flex-wrap md:flex-nowrap gap-6 mb-6">
+                <div class="w-full md:w-1/2 p-4 border rounded-md bg-gray-50">
+                    <h3 class="text-lg font-bold text-center mb-2">Output Summary</h3>
+                    <table class="w-full text-center">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="p-2"></th>
+                                <th class="p-2 font-semibold">07:00 ~ 19:00</th>
+                                <th class="p-2 font-semibold">19:00 ~ 07:00</th>
+                                <th class="p-2 font-semibold">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2 font-semibold">Output (pcs)</td>
+                                <td id="output-summary-day" class="text-2xl font-bold">0</td>
+                                <td id="output-summary-night" class="text-2xl font-bold">0</td>
+                                <td id="output-summary-total" class="text-2xl font-bold">0</td>
+                            </tr>
+                            <tr class="text-red-600">
+                                <td class="p-2 font-semibold">Lost (pcs)</td>
+                                <td id="output-summary-day-lost">0 (0%)</td>
+                                <td id="output-summary-night-lost">0 (0%)</td>
+                                <td id="output-summary-total-lost">0 (0%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                    <div class="w-full md:w-1/2 flex items-end gap-4 p-4 border rounded-md bg-gray-50">
+                    <div class="flex-grow grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="output-from-date" class="block text-sm font-medium text-gray-700" data-translate="From dateline">From date</label>
+                            <input type="datetime-local" id="output-from-date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="output-to-date" class="block text-sm font-medium text-gray-700" data-translate="To dateline">To date</label>
+                            <input type="datetime-local" id="output-to-date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="output-family-filter" class="block text-sm font-medium text-gray-700">Family</label>
+                            <select id="output-family-filter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                                </select>
+                        </div>
+                    </div>
+                    <button id="output-modal-search-btn" class="h-10 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700 self-end">
+                        SEARCH
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white">
+                <table class="w-full text-left">
+                    <thead>
+                    <tr class="border-b-2 bg-gray-50">
+                        <th data-col="id" id="output-col-id" class="p-3 text-sm font-semibold">Mold ID</th>
+                        <th data-col="family" class="p-3 text-sm font-semibold">Family</th>
+                        <th data-col="process" class="p-3 text-sm font-semibold">Process</th>
+                        <th data-col="mold_cavity" class="p-3 text-sm font-semibold">Mold Cavity</th>
+                        <th data-col="actual_cavity" class="p-3 text-sm font-semibold">Actual Cavity</th>
+                        <th data-col="capacity" class="p-3 text-sm font-semibold">Capacity</th>
+                        <th data-col="output" class="p-3 text-sm font-semibold">Output</th>
+                        <th data-col="subtotal" class="p-3 text-sm font-semibold">SubTotal</th>
+                        <th data-col="efficiency" class="p-3 text-sm font-semibold">Efficiency</th>
+                        <th data-col="current" id="output-col-current" class="p-3 text-sm font-semibold">Current Cycle</th>
+                        <th data-col="target" class="p-3 text-sm font-semibold" data-translate="Target">Target</th>
+                        <th data-col="upper" class="p-3 text-sm font-semibold">Upper Limit</th>
+                        <th data-col="lower" class="p-3 text-sm font-semibold">Lower Limit</th>
+                        <th data-col="lost_pcs" class="p-3 text-sm font-semibold">Total lost pcs</th>
+                        <th data-col="lost_time" class="p-3 text-sm font-semibold">Lost time</th>
+                    </tr>
+                    </thead>
+                    <tbody id="output-table-modal-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

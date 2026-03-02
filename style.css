@@ -1,0 +1,320 @@
+html, body {
+    margin: 0; padding: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f6f9; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+.page-header {
+    background-color: #fff; color: #333; padding: 0 16px; height: 60px;
+    display: flex; align-items: center; 
+    flex-shrink: 0; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; z-index: 10;
+}
+.page-header .logo-container { flex-shrink: 0; }
+.page-header .flex.items-center.gap-4 { flex-grow: 1; justify-content: center; min-width: 0; }
+.page-header .flex.items-center.space-x-4 { flex-shrink: 0; }
+
+.logo-container, .header-right { display: flex; align-items: center; gap: 16px; }
+.logo-container img { height: 35px; }
+.datetime-display { font-size: 16px; }
+.hidden { display: none; }
+
+/* ĐÚNG VỚI id="dashboard-grid" */
+#dashboard-grid{
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 6px;
+  padding: 12px;
+  box-sizing: border-box;
+  flex-grow: 1;
+  min-height: 0;
+  opacity: 1;
+  transition: opacity .3s ease-in-out, transform .3s ease-in-out; /* thêm transform */
+  will-change: opacity, transform;
+}
+#dashboard-grid.fading-out,
+#dashboard-grid.tab-fade-out{                 /* alias cho JS mới */
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+
+/* ------ CARD ------ */
+.info-card {
+    background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px;
+    overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s ease-in-out; cursor: pointer; position: relative;
+}
+.info-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+
+.card-header { background-color: #5bbeba; color: white; text-align: center; flex-shrink: 0; padding: 2px;
+  border-top-left-radius: inherit; border-top-right-radius: inherit; overflow: hidden;
+}
+.card-header .vt-code { font-size: 1.4em; font-weight: bold; }
+.card-header .product-name { font-size: 1.1em; }
+
+.card-quantity {
+    font-size: 3em; font-weight: 900; color: #212529; flex-grow: 1;
+    display: flex; align-items: center; justify-content: center;
+}
+.card-specs, .card-details {
+    display: flex; width: 100%; flex-shrink: 0; text-align: center; background-color: #fafafa;
+}
+.card-details { border-top: 1px solid #eeeeee; }
+.card-spec-col { flex: 1; padding: 2px 0; }
+.card-spec-col + .card-spec-col { border-left: 1px solid #eeeeee; }
+.card-spec-col .value { font-weight: 600; font-size: 1.25em; }
+.card-spec-col .label { font-size: 0.9em; color: #666; }
+.card-footer { padding: 2px 0; font-size: 0.85em; flex-shrink: 0; color: #6c757d; text-align: center; background-color: #f1f3f5; }
+
+/* Badge F – luôn ở trên cùng, không đẩy layout */
+.flex-indicator {
+  position: absolute; top: 0px; left: 0px;
+  background-color: rgb(0, 180, 200) !important; color: rgb(246, 246, 246);
+  font-weight: bold; font-size: 15px; width: 26px; height: 26px;
+  border-radius: 7px 0px 8px 0px; display: flex; align-items: center; justify-content: center;
+  z-index: 10; border: 2px solid white;
+}
+
+/* Action indicator (giữ nguyên) */
+.action-indicator{
+  position:absolute; top:6px; right:6px;
+  width:20px; height:20px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#fff; background:#f59e0b;
+  cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.action-indicator.urgent{ background:#dc2626; }
+
+/* Hiệu ứng pulse CHỈ khi có class .status-breached */
+.info-card.status-breached{
+  overflow: visible; position: relative;
+}
+.info-card.status-breached::after{
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  animation: pulse-red 2.5s infinite; will-change: box-shadow; z-index: 0;
+}
+/* Nội dung card luôn ở trên glow */
+.info-card > * { position: relative; z-index: 1; }
+
+@keyframes pulse-red {
+  0%   { box-shadow: 0 0 0 0 rgba(231, 76, 60, .7); }
+  70%  { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+/* ------ NAV LINKS ------ */
+.page-nav-link {
+    text-decoration: none; color: #374151; font-weight: 500; padding: 8px 16px;
+    border-radius: 9999px; transition: all 0.3s ease-in-out; display: inline-flex;
+    align-items: center; gap: 8px;
+}
+.page-nav-link:not(.active):hover { background-color: #f3f4f6; color: #1f2937; }
+.page-nav-link.active {
+    background-color: #3b82f6; color: white; font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* ------ MENU ------ */
+.menu-icon { width: 30px; height: 25px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+.menu-icon span { display: block; width: 100%; height: 3px; background-color: #333; border-radius: 3px; }
+
+.dropdown-menu { 
+    display: none; position: absolute; top: calc(100% + 8px); right: 0; background-color: white; 
+    border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; 
+    padding: 8px 0; list-style: none; margin: 0; 
+}
+.dropdown-menu.show { display: block; }
+.dropdown-menu li a { display: flex; align-items: center; gap: 12px; padding: 10px 16px; text-decoration: none; color: #333; font-size: 15px; }
+.dropdown-menu li a:hover { background-color: #f4f6f9; }
+.dropdown-menu li a svg { width: 20px; height: 20px; fill: #626262; }
+
+.date-shift-btn.active { background-color: hsl(217, 91%, 60%); color: white; font-weight: bold; }
+
+/* ------ POPUP HEIGHT (Chart modal) ------ */
+@media screen and (min-width: 1024px) {
+  #chart-modal > div {
+    height: 95vh; max-height: 95vh; display: flex; flex-direction: column;
+  }
+}
+
+/* ------ Hourly Efficiency responsive ------ */
+#chart-container { width: 100%; height: auto; min-height: 240px; }
+#chart-container canvas { width: 100% !important; height: auto !important; }
+
+@media (max-width: 768px) {
+  #chart-modal .col-span-12 { padding: 8px; }
+  #chart-container { min-height: 200px; }
+}
+
+/* ------ RESPONSIVE BREAKPOINTS ------ */
+@media (max-width: 1279px) {
+  .page-header { flex-wrap: wrap; justify-content: space-between; align-items: center; height: auto; gap: 8px; }
+  .page-header .logo-container, .page-header .header-right { order: 0; }
+  .page-header .flex.items-center.gap-4 { order: 1; width: 100%; justify-content: center; }
+  .page-header .logo-container img { height: 28px; }
+  .page-header .page-nav-link { padding: 6px 12px; font-size: 0.9rem; }
+  .menu-icon { width: 26px; height: 22px; }
+  .menu-icon span { height: 2.5px; }
+
+  .page-header .datetime-display,
+  .page-header #dashboard-title,
+  .page-header .flex.items-center.space-x-4 .hidden.lg\:flex,
+  .logo-container .bg-gray-100 { display: none; }
+
+  #dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: unset;
+      grid-auto-rows: min-content;
+      overflow-y: auto; gap: 10px;
+  }
+
+  .info-card .card-header { padding: 0px; }
+  .info-card .vt-code { font-size: 1rem !important; }
+  .info-card .product-name { font-size: 0.75rem !important; }
+  .info-card .card-quantity { font-size: 1.5rem !important; }
+  .info-card .font-bold.text-lg { font-size: clamp(1.1rem, 4.5vw, 1.5rem) !important; }
+  .info-card .text-gray-500 { font-size: 0.8rem !important; }
+  .info-card .card-specs, .info-card .card-details { padding: 0px 0; }
+  .info-card .value { font-size: clamp(0.8rem, 3vw, 1rem) !important; }
+  .info-card .label, .info-card .text-gray-500 { letter-spacing: normal !important; font-size: 0.8rem !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  #dashboard-grid { grid-template-columns: repeat(5, 1fr); }
+}
+.info-card > .flex-indicator,
+.info-card > .action-indicator { position: absolute !important; z-index: 10; }
+
+.ap-wrap{ margin-top:8px; }
+
+/* tiêu đề + nút add nhẹ nhàng như các ô form */
+.ap-head{ display:flex; justify-content:space-between; align-items:center; margin:6px 0 8px; }
+.ap-head h4{ font-weight:600; font-size:0.875rem; color:#374151; }
+.ap-add-btn{
+  border:1px solid #D1D5DB; background:#fff; padding:4px 8px;
+  border-radius:8px; font-weight:600; font-size:0.875rem; line-height:1.25rem;
+}
+
+/* bảng: cỡ chữ như input khác, viền mảnh */
+.ap-table{
+  width:100%; border-collapse:collapse; /* gộp viền cho mảnh & gọn */
+  font: 400 0.875rem/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial; /* text-sm */
+  color:#374151;
+}
+.ap-table th,.ap-table td{
+  border:1px solid #E5E7EB; /* mảnh như gray-200/300 */
+  padding:6px 8px;          /* nhỏ gọn như input */
+}
+.ap-table thead th{
+  background:#F9FAFB; text-transform:none; font-weight:600; /* giống label form */
+}
+
+/* ô nhập trong bảng dùng đúng style input chung */
+.ap-table td .ap-input{
+  width:100%; padding:6px 8px;
+  border:1px solid #D1D5DB; border-radius:6px; font:inherit; color:inherit;
+}
+
+/* nút xóa nhẹ nhàng */
+.ap-del{
+  border:1px solid #D1D5DB; background:#fff; border-radius:8px;
+  font-weight:600; width:28px; height:28px; line-height:24px;
+}
+.ap-del:hover{ background:#F3F4F6; }
+
+
+
+/* ——— Action status pills ——— */
+.pill{display:inline-flex;align-items:center;gap:.4rem;
+  padding:.2rem .55rem;border-radius:8px;font:600 12px/1.2 system-ui;
+  border:1px solid transparent;white-space:nowrap}
+.pill.yellow{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.pill.green {background:#D1FAE5;border-color:#A7F3D0;color:#065F46}
+
+/* icon buttons in table header/cells */
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border:1px solid #E5E7EB;border-radius:8px;background:#fff}
+.icon-btn:hover{background:#F3F4F6}
+
+/* “mini” subtable row */
+.extra-row-mini td{border-top:1px dashed #E5E7EB}
+
+
+
+
+/* ===== Skeleton / Shimmer ===== */
+:root{
+  --sk-base:#e5e7eb;           /* gray-200 */
+  --sk-highlight:#f3f4f6;      /* gray-100 */
+  --sk-radius: 10px;
+}
+.skeleton{
+  position: relative;
+  overflow: hidden;
+  background: var(--sk-base);
+  border-radius: var(--sk-radius);
+}
+.skeleton::after{
+  content:"";
+  position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    var(--sk-highlight) 50%,
+    rgba(255,255,255,0) 100%);
+  animation: sk-shimmer 1.3s infinite;
+}
+@keyframes sk-shimmer{
+  100% { transform: translateX(100%); }
+}
+
+/* Card giả lập layout thẻ thiết bị */
+.sk-card{
+  display: grid;
+  grid-template-rows: 44px 1fr 28px;
+  height: 100%;
+}
+.sk-card .sk-header { border-radius: 8px 8px 0 0; }
+.sk-card .sk-footer { border-radius: 0 0 8px 8px; }
+.sk-chip{ width: 26px; height: 26px; border-radius: 0 7px 0 8px; position:absolute; top:0; right:0; }
+
+/* Dòng chữ/ô nhỏ */
+.sk-line{ height: 12px; }
+.sk-line.lg{ height: 18px; }
+.sk-pill{ height: 24px; width: 70px; border-radius: 9999px; }
+
+/* Bảng */
+.sk-row{ display:grid; grid-template-columns: 1fr 100px 100px 100px; gap:8px; padding:8px 0; }
+
+/* Giảm chuyển động nếu người dùng yêu cầu */
+@media (prefers-reduced-motion: reduce){
+  .skeleton::after{ animation: none; }
+}
+
+/* Lưới: giữ kích thước thẻ nhất quán như info-card */
+#dashboard-grid .sk-wrapper{ 
+  background:#fff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  padding:0; position: relative;
+}
+/* Reason modal */
+.rm-overlay{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 10000;            /* > 2000/3000 của các overlay khác */
+  display: flex; align-items: center; justify-content: center;
+}
+.rm-overlay[hidden]{ display:none; }
+.rm{width:min(460px,92vw);background:#fff;border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+.rm-header{padding:16px 20px;font-weight:700;border-bottom:1px solid #eef2f7}
+#reason-form{padding:16px 20px}
+.rm-label{display:flex;justify-content:space-between;font-size:12px;color:#64748b;
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+#rm-input{width:100%;min-height:96px;padding:10px 12px;border:1.5px solid #e2e8f0;
+  border-radius:8px;font:inherit;resize:vertical}
+.rm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.rm-actions button{padding:10px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer}
+#rm-cancel{background:#f1f5f9;color:#475569}
+#rm-ok{background:#1677ff;color:#fff}
+#rm-ok:disabled{opacity:.6;cursor:not-allowed}

@@ -1,0 +1,2 @@
+Mismatch at details->0->subtotal: Legacy=1800, Laravel=null
+  Types: Legacy=integer, Laravel=NULL

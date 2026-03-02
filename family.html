@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="image/icon2.png">
+  <link rel="stylesheet" href="assets/css/translation.css">
+  <script src="assets/js/tailwindcss.js"></script>
+  <script src="assets/js/translations.js" defer></script>
+
+    <link rel="stylesheet" href="assets/css/all.min.css"> 
+    <link rel="stylesheet" href="assets/css/local-fonts.css"> 
+    <link rel="stylesheet" href="assets/css/flatpickr.min.css">
+    <link rel="stylesheet" href="assets/css/confirmDate.css">
+    <link rel="icon" type="image/png" href="image/icon2.png">
+    <script src="assets/js/vue.min.js"></script>
+    <script src="assets/js/flatpickr.js"></script>
+    <script src="assets/js/chart.js"></script>
+    <script src="assets/js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="assets/js/confirmDate.js"></script>
+  <title>Family / Process - Output & Efficiency</title>
+  <style>
+    :root{ --border:#8f96a3; --title:#222; --bg:#fff; --muted:#6b7280; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:#f7f8fb; color:#111827}
+    table, th, td { font-variant-numeric: Roboto; font-weight: bold; }
+    .wrap{max-width:1280px;margin:24px auto;padding:0 16px}
+    .toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+    .toolbar .group{display:flex;flex-direction:column;gap:6px}
+    label{font-size:12px;color:var(--muted)}
+    input[type="datetime-local"]{padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #e5e7eb;background:#111827;color:#fff;font-weight:600;cursor:pointer}
+    /* Pretty pill buttons for Apply & 07→07 */
+    .pill-btn{position:relative; display:inline-flex; align-items:center; justify-content:center;margin-bottom: .8rem; padding:1.0em 1.8em; font-size:12px; text-transform:uppercase; letter-spacing:2px; font-weight:600; color:#000; background:#fff; border:none; border-radius:40px; box-shadow:0 8px 15px rgba(0,0,0,.1); transition:all .3s ease; cursor:pointer; outline:none; user-select:none}
+    .pill-btn:hover{background:#23c483; box-shadow:0 15px 20px rgba(46,229,157,.4); color:#fff; transform:translateY(-7px)}
+    .pill-btn:active{transform:translateY(-1px)}
+    .pill-btn:disabled{opacity:.6; cursor:not-allowed; transform:none; box-shadow:0 8px 15px rgba(0,0,0,.1)}
+    /* spinner still works when .loading is applied */
+    .pill-btn.loading{color:transparent !important; background:#23c483; opacity:1 !important; box-shadow:0 12px 22px rgba(35,196,131,.35); transform:none; pointer-events:none}
+    .pill-btn.loading::after{content:none}
+    button.secondary{background:#fff;color:#111827}
+    button[disabled]{opacity:.7;cursor:not-allowed}
+    /* Loading animation (square jump + shadow) */
+    .pill-btn .btn-text{display:inline-block}
+    .pill-btn .loader{display:none;width:24px;height:24px;margin:auto;position:relative}
+    .pill-btn.loading .btn-text{display:none}
+    .pill-btn.loading .loader{display:block}
+    .loader:before{content:"";width:24px;height:4px;background:#f0808050;position:absolute;left:0;right:0;margin:0 auto;bottom:-8px;border-radius:50%;animation:shadow324 .5s linear infinite}
+    .loader:after{content:"";width:100%;height:100%;background:#f08080;position:absolute;top:0;left:0;border-radius:4px;animation:jump7456 .5s linear infinite}
+    @keyframes jump7456{15%{border-bottom-right-radius:3px}25%{transform:translateY(5px) rotate(22.5deg)}50%{transform:translateY(10px) scale(1,.9) rotate(45deg);border-bottom-right-radius:40px}75%{transform:translateY(5px) rotate(67.5deg)}100%{transform:translateY(0) rotate(90deg)}}
+    @keyframes shadow324{0%,100%{transform:scale(1,1)}50%{transform:scale(1.2,1)}}
+    /* Progress bar */
+    .progress{height:8px;background:#e5e7eb;border-radius:9999px;overflow:hidden}
+    .progress .bar{height:100%;width:0%;background:#111827;transition:width .2s ease}
+    .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-top:4px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    @media (max-width: 1000px){.grid-2{grid-template-columns:1fr}}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,.04);}
+    .card header{padding:10px 14px;border-bottom:1px solid #e5e7eb;background:#fafafa;border-radius:16px 16px 0 0}
+    .card h2{margin:0;font-size:16px;color:var(--title);letter-spacing:.2px}
+    .card .body{padding:12px}
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+    th,td{border:1px solid var(--border);padding:8px;text-align:center;font-size:14px;vertical-align:middle}
+    thead th{background:#f9fafb;font-weight:700}
+    .first-col{font-weight:600;text-align:left}
+    .muted{color:var(--muted)}
+    .status{font-size:12px;color:#6b7280;margin:6px 0 0 2px}
+    /* Efficiency chips */
+    .eff-high,.eff-mid,.eff-low{display:inline-block;padding:2px 8px;border-radius:9999px;border:1px solid transparent;font-weight:600}
+    .eff-high{background:#e7f7ee;border-color:#10b981;color:#065f46}
+    .eff-mid{background:#fff4e5;border-color:#e4940a;color:#92400e}
+    .eff-low{background:#fdecec;border-color:#ef4444;color:#7f1d1d}
+    tfoot td{font-weight:700;background:#f3f4f6}
+    /* smaller pill size variant */
+    .pill-sm{padding:.5em 1.1em; border-radius:26px; letter-spacing:1.2px; min-height:30px; line-height:1}
+    .pill-sm .loader{width:16px;height:16px}
+    .pill-sm .loader:before{width:16px;height:3px;bottom:-6px}
+    
+</style>
+  <!-- Tailwind for the new header UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <!-- ====== App Header (Tailwind) ====== -->
+  <header class="app-header fixed top-0 left-0 right-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 p- sm:p-2 bg-white/90 backdrop-blur shadow-md rounded-none">
+    <div class="flex items-center space-x-4">
+      <a href="family.html" class="flex items-center space-x-3">
+        <img src="image/icon2.png" alt="Logo" class="h-8 sm:h-10">
+        <img src="image/ems_.png" alt="EMS Logo" class="h-7 sm:h-8">
+      </a>
+    </div>
+
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-700 text-center">EMS Family</h1>
+
+    <div class="flex items-center space-x-6">
+      <div class="text-lg font-semibold text-gray-600" id="datetime-display"></div>
+
+      <div class="relative">
+        <button id="menu-button" class="p-2 rounded-md hover:bg-gray-200 transition-colors" aria-label="Menu">
+          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border">
+          <a href="index.html" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+            <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            EMS Monitoring
+          </a>
+          <a href="backend/backend.php" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+            <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            System Settings
+          </a>
+          <a href="dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+            <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div id="header-spacer"></div>
+  <div class="wrap">
+    <div class="toolbar">
+      <div class="group">
+        <label for="from">From (VN)</label>
+        <input id="from" type="datetime-local" />
+      </div>
+      <div class="group">
+        <label for="to">To (VN)</label>
+        <input id="to" type="datetime-local" />
+      </div>
+      <div class="group">
+  <label>Family</label>
+  <div class="flex items-center gap-2">
+    <button id="filterAllBtn" type="button" class="pill-btn pill-sm">All</button>
+    <select id="familySelect"
+            style="padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;min-width:220px">
+      <option value="">— Select a family —</option>
+      <!-- JS sẽ tự động thêm các option -->
+    </select>
+  </div>
+</div>
+      <div class="group" style="gap:8px;flex-direction:row;margin-left:auto">
+        <button id="apply" class="pill-btn pill-sm"><span class="btn-text">Apply</span><span class="loader"></span></button>
+        <button id="today" class="pill-btn pill-sm hidden">
+  <span class="btn-text"></span><span class="loader"></span>
+</button>
+      </div>
+      <div class="group" id="progressWrap" style="display:none;min-width:260px">
+        <label>Progress</label>
+        <div class="progress"><div class="bar" id="progressBar"></div></div>
+        <div class="progress-meta"><span id="progressText">0 / 0</span><span id="progressPct">0%</span><span id="progressEta">ETA —</span></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <section class="card">
+        <header><h2>Output</h2></header>
+        <div class="body">
+          <table id="tblOutput">
+          <colgroup>
+            <col style="width:40%" />
+            <col style="width:20%" />
+            <col style="width:20%" />
+            <col style="width:20%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="first-col">Family / Process</th>
+              <th>Molding</th>
+              <th>Tufting</th>
+              <th>Blistering</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+          <p class="status" id="statusOut"></p>
+        </div>
+      </section>
+      <section class="card">
+        <header><h2>Efficiency</h2></header>
+        <div class="body">
+          <table id="tblEff">
+          <colgroup>
+            <col style="width:40%" />
+            <col style="width:20%" />
+            <col style="width:20%" />
+            <col style="width:20%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="first-col">Family / Process</th>
+              <th>Molding</th>
+              <th>Tufting</th>
+              <th>Blistering</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+          <p class="status" id="statusEff"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+<script>
+const PROCESSES=['mold','tuft','blister'];
+const API_FAMILIES='api.php?action=get_families&process=';
+const API_OUTPUT_REPORT='api.php?action=get_output_report';
+const API_OUTPUT_BULK = 'api.php?action=get_output_report_bulk';
+function fmtNumber(v){
+  const n = Number(v || 0);
+  if (!isFinite(n) || n === 0) return '-';
+  return n.toLocaleString('en-US');
+}
+function fmtPercent(v){
+  const n = Number(v || 0);
+  if (!isFinite(n) || n === 0) return '-';
+  return n.toFixed(2) + '%';
+}
+function effClass(v){
+  const n = Number(v||0);
+  if(!isFinite(n) || n<=0) return 'eff-low';
+  if(n>=85) return 'eff-high';
+  if(n>=50) return 'eff-mid';
+  return 'eff-low';
+}
+function toLocalInputValue(d){const pad=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+// === Only show & compute for this fixed family list (in this order) ===
+const FAMILY_WHITELIST = [
+  'Alpha',
+  'Arjun (Oral-B)',
+  'Bane',
+  'Classic 35 (Oral-B) ST',
+  'Classic 40 (Oral-B)',
+  'Gucci (Oral-B)',
+  'Indicator 35 (IU35)',
+  'Jordan Green family',
+  'Jordan Step 1',
+  'Jordan Step 2',
+  'Jordan Step 3',
+  'Robinhood (Oral-B)',
+  'Sherwood 40 (Oral-B)',
+  'Wisdom Adult',
+  'Wisdom Kids',
+  'ZAHA Junior',
+  'ZAHA Kids'
+];
+// Map: display name -> actual API name (if API uses slightly different spacing/case)
+const FAM_API_NAME = {};
+const normFam = s => String(s||'').trim().replace(/  +/g,' ').toLowerCase();
+let FAMILIES=[];
+let latestLoad=0;
+// CSS.escape polyfill (nhiều trình duyệt cũ thiếu)
+if(!window.CSS) window.CSS = {};
+if(!CSS.escape){ CSS.escape = s => String(s).replace(/[^a-z0-9_-]/gi,'_'); }
+async function fetchFamilies(){
+  const normMap = new Map();
+  for(const proc of PROCESSES){
+    try{
+      const r = await fetch(API_FAMILIES + proc);
+      const j = await r.json();
+      if(Array.isArray(j)){
+        for(const it of j){
+          const name = (it.family || it.name || it) || '';
+          const n = normFam(name);
+          if(n && !normMap.has(n)) normMap.set(n, name);
+        }
+      }
+    }catch(e){ console.warn('family fetch fail', proc, e); }
+  }
+  FAMILIES = FAMILY_WHITELIST.slice();
+  for(const disp of FAMILIES){
+    const n = normFam(disp);
+    const apiName = normMap.get(n) || normMap.get(normFam(disp.replace(/  +/g,' '))) || disp;
+    FAM_API_NAME[disp] = apiName;
+    if(!normMap.has(n)) console.warn('Family not found in API list, will query with display name:', disp);
+  }
+}
+function populateFamilyFilter(){
+  const sel = document.getElementById('familySelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Select a family —</option>';
+  for (const fam of FAMILIES) {
+    const opt = document.createElement('option');
+    opt.value = fam;    // dùng display name làm value
+    opt.textContent = fam;
+    sel.appendChild(opt);
+  }
+}
+
+
+function renderInitTable(selectedList){
+  const outBody=document.querySelector('#tblOutput tbody');
+  const effBody=document.querySelector('#tblEff tbody');
+  if(!outBody || !effBody) return;
+  outBody.innerHTML=''; effBody.innerHTML='';
+
+  const list = Array.isArray(selectedList) && selectedList.length ? selectedList : FAMILIES;
+  for(const fam of list){
+    const id = CSS && CSS.escape ? CSS.escape(fam) : String(fam).replace(/[^a-z0-9_-]/gi,'_');
+    outBody.insertAdjacentHTML('beforeend',`<tr id="out-${id}"><td class="first-col">${fam}</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>`);
+    effBody.insertAdjacentHTML('beforeend',`<tr id="eff-${id}"><td class="first-col">${fam}</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>`);
+  }
+  scheduleSyncHeights();
+}
+
+function updateRow(fam,row){
+  const id = CSS && CSS.escape ? CSS.escape(fam) : String(fam).replace(/[^a-z0-9_-]/gi,'_');
+  const outTr=document.getElementById(`out-${id}`);
+  const effTr=document.getElementById(`eff-${id}`);
+  if(outTr){
+    outTr.children[1].innerHTML = fmtNumber(Number(row.mold?.output||0));
+    outTr.children[2].innerHTML = fmtNumber(Number(row.tuft?.output||0));
+    outTr.children[3].innerHTML = fmtNumber(Number(row.blister?.output||0));
+  }
+  if(effTr){
+    const chip = v=>`<span class="${effClass(v)}">${fmtPercent(v)}</span>`;
+    effTr.children[1].innerHTML = chip(Number(row.mold?.efficiency||0));
+    effTr.children[2].innerHTML = chip(Number(row.tuft?.efficiency||0));
+    effTr.children[3].innerHTML = chip(Number(row.blister?.efficiency||0));
+  }
+  scheduleSyncHeights();
+}
+
+function renderTotals(totals) {
+  // --- Lấy table/footers, nếu thiếu thì tự tạo ---
+  const tblOut = document.getElementById('tblOutput');
+  const tblEff = document.getElementById('tblEff');
+  if (!tblOut || !tblEff) return;
+
+  let outFoot = tblOut.querySelector('tfoot');
+  let effFoot = tblEff.querySelector('tfoot');
+
+  if (!outFoot) { outFoot = document.createElement('tfoot'); tblOut.appendChild(outFoot); }
+  if (!effFoot) { effFoot = document.createElement('tfoot'); tblEff.appendChild(effFoot); }
+
+  // Clear trước khi ghi
+  outFoot.innerHTML = '';
+  effFoot.innerHTML = '';
+
+  // --- Tổng Output: giữ logic cũ ---
+  outFoot.innerHTML = `
+    <tr>
+      <td data-translate="Total">Total</td>
+      <td>${fmtNumber(totals.out.mold)}</td>
+      <td>${fmtNumber(totals.out.tuft)}</td>
+      <td>${fmtNumber(totals.out.blister)}</td>
+    </tr>
+  `;
+
+  // --- Lấy efficiency đã render từ tbody và tính trung bình (bỏ 0) ---
+  const effBody = tblEff.querySelector('tbody');
+  const rows = effBody ? effBody.querySelectorAll('tr') : [];
+
+  const effValues = { mold: [], tuft: [], blister: [] };
+
+  rows.forEach(row => {
+    // Ô 1..3 là Molding/Tufting/Blistering
+    const take = (idx) => {
+      const txt = (row.children[idx]?.textContent || '').trim();
+      // lọc '-', '…', rỗng, rồi bỏ dấu %
+      if (!txt || txt === '-' || txt === '…') return null;
+      const v = parseFloat(txt.replace('%',''));
+      if (!isFinite(v) || v <= 0) return null;
+      return v;
+    };
+    const m = take(1); if (m != null) effValues.mold.push(m);
+    const t = take(2); if (t != null) effValues.tuft.push(t);
+    const b = take(3); if (b != null) effValues.blister.push(b);
+  });
+
+  const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0) / arr.length) : 0;
+
+  const m = avg(effValues.mold);
+  const t = avg(effValues.tuft);
+  const b = avg(effValues.blister);
+
+  const totalEffRow = `
+    <tr>
+      <td data-translate="Avg Efficiency">Avg Efficiency</td>
+      <td><span class="${effClass(m)}">${fmtPercent(m)}</span></td>
+      <td><span class="${effClass(t)}">${fmtPercent(t)}</span></td>
+      <td><span class="${effClass(b)}">${fmtPercent(b)}</span></td>
+    </tr>
+  `;
+
+  // Ghi vào <tfoot>; nếu vì lý do nào đó footer không hiển thị, chèn cuối tbody làm fallback
+  effFoot.innerHTML = totalEffRow;
+
+  // Fallback: nếu sau một frame vẫn không có hàng ở footer → chèn vào tbody
+  requestAnimationFrame(() => {
+    const footHasRow = !!tblEff.querySelector('tfoot tr');
+    if (!footHasRow) {
+      // tránh trùng lặp nếu đã có fallback
+      if (!tblEff.querySelector('tbody tr.total-efficiency-fallback')) {
+        const tr = document.createElement('tr');
+        tr.className = 'total-efficiency-fallback';
+        tr.innerHTML = totalEffRow.replace('<tr>', '<tr class="font-bold bg-gray-100">');
+        tblEff.querySelector('tbody')?.appendChild(tr);
+      }
+    }
+    scheduleSyncHeights();
+  });
+}
+
+
+function renderTables(matrix){
+  const totals={out:{mold:0,tuft:0,blister:0}, cap:{mold:0,tuft:0,blister:0}};
+  for(const fam of Object.keys(matrix||{})){
+    const row=matrix[fam]||{};
+    for(const p of PROCESSES){
+      totals.out[p]+=Number(row[p]?.output||0);
+      totals.cap[p]+=Number(row[p]?.cap||0);
+    }
+  }
+  renderTotals(totals);
+}
+
+// === Row height sync between Output & Efficiency ===
+let __syncScheduled=false;
+function scheduleSyncHeights(){
+  if(__syncScheduled) return; __syncScheduled=true;
+  requestAnimationFrame(()=>{ __syncScheduled=false; syncRowHeights(); });
+}
+function syncRowHeights(){
+  const outRows = document.querySelectorAll('#tblOutput tbody tr');
+  const effRows = document.querySelectorAll('#tblEff tbody tr');
+  const n = Math.min(outRows.length, effRows.length);
+  for(let i=0;i<n;i++){ outRows[i].style.height=''; effRows[i].style.height=''; }
+  for(let i=0;i<n;i++){
+    const h = Math.max(outRows[i].getBoundingClientRect().height, effRows[i].getBoundingClientRect().height);
+    outRows[i].style.height = h+'px';
+    effRows[i].style.height = h+'px';
+  }
+  const of = document.querySelector('#tblOutput tfoot tr');
+  const ef = document.querySelector('#tblEff tfoot tr');
+  if(of && ef){ of.style.height=''; ef.style.height=''; const hf = Math.max(of.getBoundingClientRect().height, ef.getBoundingClientRect().height); of.style.height = hf+'px'; ef.style.height = hf+'px'; }
+}
+window.addEventListener('resize', scheduleSyncHeights);
+
+async function tryFetch(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(r.status);return r.json();}
+async function fetchBulkAndRender(fromStr, toStr, selectedFamilies) {
+  // hoursTotal về sau dùng để tính efficiency tổng
+  const hoursTotal = (new Date(toStr.replace(' ','T')) - new Date(fromStr.replace(' ','T'))) / 3600000;
+  window.__hoursTotal = hoursTotal;
+
+  // Build URL bulk
+  let url = `${API_OUTPUT_BULK}&from=${encodeURIComponent(fromStr)}&to=${encodeURIComponent(toStr)}`;
+  if (Array.isArray(selectedFamilies) && selectedFamilies.length === 1) {
+    // lọc đúng 1 family (theo display name → map sang tên API nếu có)
+    const disp = selectedFamilies[0];
+    const famQuery = FAM_API_NAME[disp] || disp;
+    url += `&families=${encodeURIComponent(famQuery)}`;
+  }
+
+  // Gọi 1 lần
+  const resp = await fetch(url, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const json = await resp.json();
+  if (json.status !== 'success') throw new Error(json.message || 'API error');
+
+  // matrix: { [product]: { mold:{output,cap}, tuft:{...}, blister:{...} } }
+  const matrix = json.matrix || {};
+
+  // Chuẩn bị danh sách hiển thị theo thứ tự cũ (FAMILY_WHITELIST)
+  // nếu lọc 1 family thì chỉ render nó
+  const list = (Array.isArray(selectedFamilies) && selectedFamilies.length)
+    ? selectedFamilies
+    : FAMILIES;
+
+  // Build HTML tbody cho 2 bảng 1 lần
+  const outBody = document.querySelector('#tblOutput tbody');
+  const effBody = document.querySelector('#tblEff tbody');
+  if (!outBody || !effBody) return;
+
+  const fmtN = (v)=>{ const n=Number(v||0); return (!isFinite(n)||n===0)?'-':n.toLocaleString('en-US'); };
+  const fmtP = (v)=>{ const n=Number(v||0); return (!isFinite(n)||n===0)?'-':(n.toFixed(2)+'%'); };
+  const effCls = (v)=>{ const n=Number(v||0); if(!isFinite(n)||n<=0) return 'eff-low'; if(n>=85) return 'eff-high'; if(n>=50) return 'eff-mid'; return 'eff-low'; };
+  const chip = (v)=>`<span class="${effCls(v)}">${fmtP(v)}</span>`;
+
+  let outHTML = '';
+  let effHTML = '';
+
+  // Tính totals
+  const totals = { out:{mold:0,tuft:0,blister:0}, cap:{mold:0,tuft:0,blister:0} };
+
+  for (const fam of list) {
+    // tên hiển thị (display) -> key product (API)
+    const apiName = FAM_API_NAME[fam] || fam;
+    const row = matrix[apiName] || {}; // nếu không có data, coi như 0
+    const mold = row.mold || {}, tuft = row.tuft || {}, blister = row.blister || {};
+
+    totals.out.mold    += Number(mold.output||0);
+    totals.out.tuft    += Number(tuft.output||0);
+    totals.out.blister += Number(blister.output||0);
+    totals.cap.mold    += Number(mold.cap||0);
+    totals.cap.tuft    += Number(tuft.cap||0);
+    totals.cap.blister += Number(blister.cap||0);
+
+    // efficiency theo FE cũ: output / (cap * hoursTotal) * 100
+    const eff = (o,c)=> (c>0 && hoursTotal>0) ? (o/(c*hoursTotal))*100 : 0;
+    const moldEff = (mold.efficiency ?? eff(mold.output||0, mold.cap||0));
+    const tuftEff = (tuft.efficiency ?? eff(tuft.output||0, tuft.cap||0));
+    const blisEff = (blister.efficiency ?? eff(blister.output||0, blister.cap||0));
+
+    outHTML += `
+      <tr><td class="first-col">${fam}</td>
+        <td>${fmtN(mold.output)}</td>
+        <td>${fmtN(tuft.output)}</td>
+        <td>${fmtN(blister.output)}</td>
+      </tr>`;
+
+    effHTML += `
+      <tr><td class="first-col">${fam}</td>
+        <td>${chip(moldEff)}</td>
+        <td>${chip(tuftEff)}</td>
+        <td>${chip(blisEff)}</td>
+      </tr>`;
+  }
+
+  outBody.innerHTML = outHTML;
+  effBody.innerHTML = effHTML;
+
+  // Render totals giống logic cũ
+  renderTotals(totals); // hàm có sẵn trong file – vẫn dùng được
+
+  // Sync chiều cao 1 lần sau khi đã innerHTML xong
+  requestAnimationFrame(()=> scheduleSyncHeights());
+}
+
+
+async function loadData(){
+  const token = Date.now(); latestLoad = token;
+
+  const from = document.getElementById('from').value.replace('T',' ') + ':00';
+  const to   = document.getElementById('to').value.replace('T',' ') + ':00';
+  const sel  = document.getElementById('familySelect');
+  const selectedFamilies = (sel && sel.value) ? [sel.value] : null;
+
+  const btnApply = document.getElementById('apply');
+  const btnToday = document.getElementById('today');
+  const statusOut = document.getElementById('statusOut');
+  const statusEff = document.getElementById('statusEff');
+
+  btnApply.disabled = btnToday.disabled = true;
+  btnApply.classList.add('loading');
+  statusOut.textContent = statusEff.textContent = 'Loading…';
+
+  try{
+    if(!FAMILIES || FAMILIES.length===0){ await fetchFamilies(); }
+
+    // 1) Vẽ khung bảng (tên family) một lần, để có “placeholder”
+    const outBody = document.querySelector('#tblOutput tbody');
+    const effBody = document.querySelector('#tblEff tbody');
+    const hoursTotal = (new Date(to.replace(' ','T')) - new Date(from.replace(' ','T')))/3600000;
+    window.__hoursTotal = hoursTotal;
+
+    const list = (selectedFamilies && selectedFamilies.length) ? selectedFamilies : FAMILIES;
+    const rowIndexByFam = new Map();
+    let outHTML = '', effHTML = '';
+    list.forEach((dispName, idx)=>{
+      rowIndexByFam.set(dispName, idx);
+      outHTML += `<tr data-fam="${dispName}">
+        <td class="first-col">${dispName}</td>
+        <td class="mold">…</td><td class="tuft">…</td><td class="blister">…</td>
+      </tr>`;
+      effHTML += `<tr data-fam="${dispName}">
+        <td class="first-col">${dispName}</td>
+        <td class="mold">…</td><td class="tuft">…</td><td class="blister">…</td>
+      </tr>`;
+    });
+    outBody.innerHTML = outHTML;
+    effBody.innerHTML = effHTML;
+
+    // 2) Chạy 3 fetch song song (mold/tuft/blister)
+    const procs = ['mold','tuft','blister'];
+    const fmtN = (v)=>{ const n=Number(v||0); return (!isFinite(n)||n===0)?'-':n.toLocaleString('en-US'); };
+    const pct  = (o,c)=> (c>0 && hoursTotal>0) ? (o/(c*hoursTotal))*100 : 0;
+    const fmtP = (v)=>{ const n=Number(v||0); return (!isFinite(n)||n===0)?'-':(n.toFixed(2)+'%'); };
+    const effCls = (v)=>{ const n=Number(v||0); if(!isFinite(n)||n<=0) return 'eff-low'; if(n>=85) return 'eff-high'; if(n>=50) return 'eff-mid'; return 'eff-low'; };
+    const chip = (v)=>`<span class="${effCls(v)}">${fmtP(v)}</span>`;
+
+    // Totals (cộng dần khi có cột)
+    const totals = { out:{mold:0,tuft:0,blister:0}, cap:{mold:0,tuft:0,blister:0} };
+
+    await Promise.allSettled(procs.map(async (proc)=>{
+      const map = await fetchOneProcess(from, to, proc, selectedFamilies); // Map(product → {out,cap})
+
+      // Batch update DOM: đi theo list để giữ thứ tự hiển thị
+      const updates = [];
+      for (const dispName of list) {
+        const apiName = FAM_API_NAME[dispName] || dispName;
+        const cell = map.get(apiName) || { out:0, cap:0 };
+        const outVal = fmtN(cell.out);
+        const effVal = chip(pct(cell.out, cell.cap));
+
+        updates.push({ fam: dispName, outVal, effVal, raw: cell });
+        totals.out[proc] += cell.out;
+        totals.cap[proc] += cell.cap;
+      }
+
+      // Thực hiện cập nhật DOM theo đợt (ít reflow):
+      requestAnimationFrame(()=>{
+        for (const u of updates) {
+          const trOut = outBody.querySelector(`tr[data-fam="${CSS.escape(u.fam)}"]`);
+          const trEff = effBody.querySelector(`tr[data-fam="${CSS.escape(u.fam)}"]`);
+          if (trOut) trOut.querySelector(`td.${proc}`).innerHTML = u.outVal;
+          if (trEff) trEff.querySelector(`td.${proc}`).innerHTML = u.effVal;
+        }
+        // cập nhật totals sau mỗi cột xong
+        renderTotals(totals);
+        scheduleSyncHeights();
+      });
+
+      // status “cột <proc> done”
+      if (latestLoad === token) {
+        statusOut.textContent = statusEff.textContent = `Updated: ${proc}`;
+      }
+    }));
+
+    if (latestLoad !== token) return;
+    statusOut.textContent = statusEff.textContent = 'Updated';
+
+  } catch(e){
+    console.error(e);
+    if (latestLoad !== token) return;
+    statusOut.textContent = statusEff.textContent = 'Error: ' + e.message;
+  } finally {
+    if (latestLoad === token){
+      btnApply.disabled = btnToday.disabled = false;
+      btnApply.classList.remove('loading');
+    }
+  }
+}
+
+async function fetchOneProcess(fromStr, toStr, proc, selectedFamilies) {
+  let url = `${API_OUTPUT_BULK}&from=${encodeURIComponent(fromStr)}&to=${encodeURIComponent(toStr)}&proc=${proc}`;
+  if (Array.isArray(selectedFamilies) && selectedFamilies.length === 1) {
+    const disp = selectedFamilies[0];
+    const famQuery = FAM_API_NAME[disp] || disp;
+    url += `&families=${encodeURIComponent(famQuery)}`;
+  }
+  const r = await fetch(url, { headers:{'Accept':'application/json'}, cache:'no-store' });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  if (j.status !== 'success') throw new Error(j.message || 'API error');
+
+  // j.matrix = { [product]: { [proc]: {output, cap} } } (vì proc 1 cái nên chỉ 1 nhánh)
+  const map = new Map();
+  const m = j.matrix || {};
+  Object.keys(m).forEach(prod=>{
+    const cell = m[prod][proc] || { output:0, cap:0 };
+    map.set(prod, { out: Number(cell.output||0), cap: Number(cell.cap||0) });
+  });
+  return map;
+}
+
+
+(function initDefaults(){const now=new Date();const today7=new Date(now.getFullYear(),now.getMonth(),now.getDate(),7,0,0);const from=new Date(today7.getTime()-24*3600*1000);document.getElementById('from').value=toLocalInputValue(from);document.getElementById('to').value=toLocalInputValue(today7);})();
+document.getElementById('apply').addEventListener('click',loadData);
+document.getElementById('today').addEventListener('click',()=>{const now=new Date();const today7=new Date(now.getFullYear(),now.getMonth(),now.getDate(),7,0,0);const from=new Date(today7.getTime()-24*3600*1000);document.getElementById('from').value=toLocalInputValue(from);document.getElementById('to').value=toLocalInputValue(today7);loadData();});
+(async()=>{await fetchFamilies();populateFamilyFilter();loadData();})();
+// GẮN MỘT LẦN Ở NGOÀI
+const btnAll = document.getElementById('filterAllBtn');
+const selFam = document.getElementById('familySelect');
+
+if (btnAll && selFam) {
+  btnAll.addEventListener('click', ()=>{
+    selFam.value = '';   // trạng thái "All"
+    loadData();
+  });
+}
+if (selFam) {
+  selFam.addEventListener('change', ()=>{
+    loadData();          // chọn 1 family → chỉ hiện family đó
+  });
+}
+
+/* Header clock + menu toggle */
+(function setupHeader(){
+  const dt = document.getElementById('datetime-display');
+  const fmt = (d)=>{ const pad=n=>String(n).padStart(2,'0'); const week=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; return `${week[d.getDay()]} ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+  if(dt){ const tick=()=>{ dt.textContent = fmt(new Date()); }; tick(); setInterval(tick,1000); }
+  const btn=document.getElementById('menu-button');
+  const menu=document.getElementById('dropdown-menu');
+  if(btn && menu){ btn.addEventListener('click', (e)=>{ e.stopPropagation(); menu.classList.toggle('hidden'); }); document.addEventListener('click', (e)=>{ if(!menu.contains(e.target) && e.target!==btn){ menu.classList.add('hidden'); } }); }
+  // spacer height = header height (responsive)
+  const spacer=document.getElementById('header-spacer');
+  const headerEl=document.querySelector('.app-header');
+  const syncSpacer=()=>{ if(spacer && headerEl){ spacer.style.height = headerEl.offsetHeight + 'px'; } };
+  syncSpacer();
+  window.addEventListener('resize', syncSpacer);
+})();
+</script>
+</body>
+</html>

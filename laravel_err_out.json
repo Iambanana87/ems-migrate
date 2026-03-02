@@ -1,0 +1,4 @@
+{
+    "status": "error",
+    "message": "Cannot use try without catch or finally"
+}

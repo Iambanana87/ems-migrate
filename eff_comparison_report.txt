@@ -1,0 +1,82 @@
+====================================
+LEGACY JSON OUTPUT:
+====================================
+{
+    "summary_all": {
+        "mold": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "tuft": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "blister": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        }
+    },
+    "details": [],
+    "_range_details": {
+        "from_local": "2026-02-28 08:01:54",
+        "to_local": "2026-02-28 09:01:54",
+        "hours": 1,
+        "db_is_utc": false
+    },
+    "_range_summary_windows": {
+        "day_from_vn": "2026-02-28 08:01:54",
+        "day_to_vn": "2026-02-28 19:00:00",
+        "night_from_vn": "2026-02-28 19:00:00",
+        "night_to_vn": "2026-02-28 09:01:54",
+        "h_day": 10.968333333333334,
+        "h_night": 0.0002777777777777778,
+        "h_total": 1
+    }
+}
+
+====================================
+LARAVEL JSON OUTPUT:
+====================================
+{
+    "summary_all": {
+        "mold": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "tuft": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "blister": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        }
+    },
+    "details": [],
+    "_range_details": {
+        "from_local": "2026-02-28 08:01:54",
+        "to_local": "2026-02-28 09:01:54",
+        "hours": 1,
+        "db_is_utc": false
+    },
+    "_range_summary_windows": {
+        "day_from_vn": "2026-02-28 08:01:54",
+        "day_to_vn": "2026-02-28 19:00:00",
+        "night_from_vn": "2026-02-28 19:00:00",
+        "night_to_vn": "2026-02-28 09:01:54",
+        "h_day": 10.968333333333334,
+        "h_night": 0.0002777777777777778,
+        "h_total": 1
+    }
+}
+
+====================================
+COMPARISON RESULTS:
+====================================
+✅ SUCCESS: Exact 100% Structural and Data Parity Confirmed!

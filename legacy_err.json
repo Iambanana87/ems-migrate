@@ -1,0 +1,35 @@
+{
+    "summary_all": {
+        "mold": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "tuft": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        },
+        "blister": {
+            "day": 0,
+            "night": 0,
+            "average": 0
+        }
+    },
+    "details": [],
+    "_range_details": {
+        "from_local": "2026-02-28 10:43:11",
+        "to_local": "2026-02-28 11:43:11",
+        "hours": 1,
+        "db_is_utc": false
+    },
+    "_range_summary_windows": {
+        "day_from_vn": "2026-02-28 10:43:11",
+        "day_to_vn": "2026-02-28 19:00:00",
+        "night_from_vn": "2026-02-28 19:00:00",
+        "night_to_vn": "2026-02-28 11:43:11",
+        "h_day": 8.280277777777778,
+        "h_night": 0.0002777777777777778,
+        "h_total": 1
+    }
+}

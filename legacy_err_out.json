@@ -1,0 +1,4 @@
+{
+    "status": "error",
+    "message": "SQLSTATE[42S22]: Column not found: 1054 Unknown column 't.mold_id' in 'on clause'"
+}

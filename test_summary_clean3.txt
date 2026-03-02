@@ -1,0 +1,14 @@
+====================================
+TESTING: get_output_report (mold)
+❌ DIFFERENCE DETECTED in get_output_report (mold):
+Saved to legacy_err_out.json and laravel_err_out.json
+====================================
+TESTING: get_output_report (tuft)
+❌ DIFFERENCE DETECTED in get_output_report (tuft):
+Saved to legacy_err_out.json and laravel_err_out.json
+====================================
+TESTING: get_output_report (blister)
+❌ DIFFERENCE DETECTED in get_output_report (blister):
+Saved to legacy_err_out.json and laravel_err_out.json
+====================================
+SOME TESTS FAILED.

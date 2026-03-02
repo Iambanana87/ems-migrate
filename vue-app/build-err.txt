@@ -1,0 +1,58 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 25 modules transformed.
+node : [31mΓ£ù[39m Build failed in 
+182ms
+At line:1 char:1
++ node --input-type=module --eval "const 
+{ build } = await import('vite ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecifi 
+   ed: ([31mΓ£ù[39m Build failed in 1  
+  82ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeComm 
+   andError
+ 
+[31m[vite]: Rollup failed to resolve 
+import "/image/icon2.png" from "C:/xampp/
+htdocs/ems/vue-app/src/views/LoginView.vu
+e".
+This is most likely unintended because 
+it can break your application at runtime.
+If you do want to externalize this 
+module explicitly add it to
+`build.rollupOptions.external`[39m
+[31m[vite]: Rollup failed to resolve 
+import "/image/icon2.png" from "C:/xampp/
+htdocs/ems/vue-app/src/views/LoginView.vu
+e".
+This is most likely unintended because 
+it can break your application at runtime.
+If you do want to externalize this 
+module explicitly add it to
+`build.rollupOptions.external`[39m
+    at viteLog (file:///C:/xampp/htdocs/e
+ms/vue-app/node_modules/vite/dist/node/ch
+unks/config.js:33635:57)
+    at onRollupLog (file:///C:/xampp/htdo
+cs/ems/vue-app/node_modules/vite/dist/nod
+e/chunks/config.js:33665:7)
+    at onLog (file:///C:/xampp/htdocs/ems
+/vue-app/node_modules/vite/dist/node/chun
+ks/config.js:33467:4)
+    at file:///C:/xampp/htdocs/ems/vue-ap
+p/node_modules/rollup/dist/es/shared/node
+-entry.js:20981:32
+    at Object.logger [as onLog] (file:///
+C:/xampp/htdocs/ems/vue-app/node_modules/
+rollup/dist/es/shared/node-entry.js:22968
+:9)
+    at 
+ModuleLoader.handleInvalidResolvedId (fil
+e:///C:/xampp/htdocs/ems/vue-app/node_mod
+ules/rollup/dist/es/shared/node-entry.js:
+21712:26)
+    at file:///C:/xampp/htdocs/ems/vue-ap
+p/node_modules/rollup/dist/es/shared/node
+-entry.js:21670:26

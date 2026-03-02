@@ -1,0 +1,32 @@
+﻿SQLSTATE[HY000] [1045] Access denied for user 'device'@'172.17.0.1' (using password: YES) (Connection: production, SQL: 
+            SELECT 
+                d.device_id             AS machine_id,
+                d.product               AS family,
+                d.process               AS process,
+                d.cavities              AS mold_cavity,
+                d.capacity              AS capacity_per_hour,
+                (d.capacity * :hoursTotal1) AS capacity,
+
+                d.target_limit          AS target,
+                d.upper_limit,
+                d.lower_limit,
+                
+                    AVG(t.cavities)   AS actual_cavity,
+                    SUM(CASE WHEN t.cycle_time > 20 THEN COALESCE(t.cavities,0) ELSE 0 END) AS output,
+                    AVG(t.cycle_time) AS current_cycle,
+                    GREATEST(0, ((AVG(d.capacity) / 3600 * TIMESTAMPDIFF(SECOND, MIN(t.`datetime`), MAX(t.`datetime`))) - SUM(CASE WHEN t.cycle_time > 20 THEN COALESCE(t.cavities,0) ELSE 0 END))) AS total_lost_pcs,
+                    GREATEST(0, (((AVG(d.capacity) / 3600 * TIMESTAMPDIFF(SECOND, MIN(t.`datetime`), MAX(t.`datetime`))) - SUM(CASE WHEN t.cycle_time > 20 THEN COALESCE(t.cavities,0) ELSE 0 END)) / (AVG(d.capacity) / 60))) AS lost_time
+                ,
+                (CASE WHEN COALESCE(d.capacity,0) > 0
+                    THEN (SUM(CASE WHEN t.cycle_time > 20 THEN COALESCE(t.cavities,0) ELSE 0 END)) / (d.capacity * :hoursTotal2) * 100
+                    ELSE 0 END) AS efficiency
+            FROM mold t
+            JOIN devices d ON BINARY t.mold_id  = BINARY d.device_id
+            WHERE d.display_type = :proc
+              AND t.`datetime`   >= :fromQ
+              AND t.`datetime`   <  :toQ
+              AND d.process IN ('Single','1st')
+              AND t.cycle_time > 20
+            GROUP BY d.device_id, d.product, d.process, d.cavities, d.capacity, d.target_limit, d.upper_limit, d.lower_limit
+            ORDER BY machine_id ASC
+        )

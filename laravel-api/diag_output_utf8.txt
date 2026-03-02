@@ -1,0 +1,147 @@
+﻿====================================
+LARAVEL DATABASE DIAGNOSTICS
+====================================
+
+--- STEP 1: Current Database ---
+Array
+(
+    [0] => stdClass Object
+        (
+            [current_db] => production
+        )
+
+)
+
+--- STEP 2: Available Databases ---
+Array
+(
+    [0] => stdClass Object
+        (
+            [Database] => central
+        )
+
+    [1] => stdClass Object
+        (
+            [Database] => information_schema
+        )
+
+    [2] => stdClass Object
+        (
+            [Database] => mysql
+        )
+
+    [3] => stdClass Object
+        (
+            [Database] => performance_schema
+        )
+
+    [4] => stdClass Object
+        (
+            [Database] => phpmyadmin
+        )
+
+    [5] => stdClass Object
+        (
+            [Database] => production
+        )
+
+    [6] => stdClass Object
+        (
+            [Database] => test
+        )
+
+)
+
+--- STEP 3: Tables in 'production' ---
+Array
+(
+    [0] => stdClass Object
+        (
+            [Tables_in_production] => audit_trail
+        )
+
+    [1] => stdClass Object
+        (
+            [Tables_in_production] => blister
+        )
+
+    [2] => stdClass Object
+        (
+            [Tables_in_production] => device_action_notes
+        )
+
+    [3] => stdClass Object
+        (
+            [Tables_in_production] => device_action_plans
+        )
+
+    [4] => stdClass Object
+        (
+            [Tables_in_production] => device_actions
+        )
+
+    [5] => stdClass Object
+        (
+            [Tables_in_production] => device_status
+        )
+
+    [6] => stdClass Object
+        (
+            [Tables_in_production] => devices
+        )
+
+    [7] => stdClass Object
+        (
+            [Tables_in_production] => factory_layouts
+        )
+
+    [8] => stdClass Object
+        (
+            [Tables_in_production] => injection
+        )
+
+    [9] => stdClass Object
+        (
+            [Tables_in_production] => live_device_data
+        )
+
+    [10] => stdClass Object
+        (
+            [Tables_in_production] => mold
+        )
+
+    [11] => stdClass Object
+        (
+            [Tables_in_production] => power_status
+        )
+
+    [12] => stdClass Object
+        (
+            [Tables_in_production] => tuft
+        )
+
+    [13] => stdClass Object
+        (
+            [Tables_in_production] => users
+        )
+
+)
+
+--- STEP 4: Mold Table Count ---
+Array
+(
+    [0] => stdClass Object
+        (
+            [total] => 0
+        )
+
+)
+
+--- STEP 5: Connection Details ---
+DB Connection Name: production
+DB Host: localhost
+DB Port: 3306
+DB Database: production
+DB Username: device
+PDO Connection Status (DSN-like info): localhost via TCP/IP
+Connection Type: TCP/IP

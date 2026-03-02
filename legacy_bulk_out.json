@@ -1,0 +1,62 @@
+{
+    "status": "success",
+    "hours": 24,
+    "matrix": {
+        "FamilyA": {
+            "mold": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            },
+            "tuft": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            },
+            "blister": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            }
+        },
+        "FamilyB": {
+            "mold": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            },
+            "tuft": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            },
+            "blister": {
+                "output": 0,
+                "cap": 0,
+                "efficiency": 0
+            }
+        }
+    },
+    "totals": {
+        "out": {
+            "mold": 0,
+            "tuft": 0,
+            "blister": 0
+        },
+        "cap": {
+            "mold": 0,
+            "tuft": 0,
+            "blister": 0
+        },
+        "eff_weighted": {
+            "mold": 0,
+            "tuft": 0,
+            "blister": 0
+        },
+        "eff_avg": {
+            "mold": 0,
+            "tuft": 0,
+            "blister": 0
+        }
+    }
+}

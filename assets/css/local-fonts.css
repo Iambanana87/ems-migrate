@@ -1,0 +1,22 @@
+/* File: assets/css/local-fonts.css */
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400; /* Tương ứng với wght@400 */
+  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500; /* Tương ứng với wght@500 */
+  src: url('../fonts/Roboto-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700; /* Tương ứng với wght@700 */
+  src: url('../fonts/Roboto-Bold.ttf') format('truetype');
+}

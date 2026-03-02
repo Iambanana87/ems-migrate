@@ -1,0 +1,2 @@
+Mismatch at message: Legacy="SQLSTATE[42S22]: Column not found: 1054 Unknown column 't.mold_id' in 'on clause'", Laravel="Symfony\\Component\\HttpFoundation\\JsonResponse::__construct(): Argument #2 ($status) must be of type int, string given, called in C:\\xampp\\htdocs\\ems\\laravel-api\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\JsonResponse.php on line 32"
+  Types: Legacy=string, Laravel=string

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* 
+ * global.css
+ * According to strict architecture rules, this file only contains 
+ * Tailwind base and global animations (pulse-red, shimmer).
+ * All component-specific styles must go in <style scoped>
+ */
+
+:root {
+  --sk-base:      #e5e7eb;
+  --sk-highlight: #f3f4f6;
+  --sk-radius:    10px;
+}
+
+/* ---- Skeleton / Shimmer (from legacy) ---- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--sk-base);
+  border-radius: var(--sk-radius);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    var(--sk-highlight) 50%,
+    rgba(255,255,255,0) 100%);
+  animation: sk-shimmer 1.3s infinite;
+}
+@keyframes sk-shimmer { 
+  100% { transform: translateX(100%); } 
+}
+
+/* ---- Pulse-red (status breach animation) ---- */
+@keyframes pulse-red {
+  0%   { box-shadow: 0 0 0 0   rgba(231,76,60,.7); }
+  70%  { box-shadow: 0 0 0 10px rgba(231,76,60,0); }
+  100% { box-shadow: 0 0 0 0   rgba(231,76,60,0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
+/* Base resets handled by Tailwind */
+html, body {
+  height: 100%;
+  background-color: #f4f6f9;
+  color: #212529;
+}

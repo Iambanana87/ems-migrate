@@ -1,0 +1,2 @@
+Mismatch at message: Legacy="SQLSTATE[42S22]: Column not found: 1054 Unknown column 't.mold_id' in 'on clause'", Laravel="Cannot use try without catch or finally"
+  Types: Legacy=string, Laravel=string
