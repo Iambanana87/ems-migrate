@@ -492,7 +492,13 @@ final class DeviceActionService
                             $newStatus = 'in_progress';
                         } else {
                             $newStatus = 'done';
-                            $newAppr   = ($beforeIssue['approval_status'] === 'approved') ? 'approved' : 'pending';
+                            if ($beforeIssue['approval_status'] === 'approved') {
+                                $newAppr = 'approved';
+                            } elseif ($beforeIssue['approval_status'] === 'rejected') {
+                                $newAppr = 'rejected';
+                            } else {
+                                $newAppr = 'pending';
+                            }
                         }
                     }
 
