@@ -151,35 +151,46 @@ class AuthController extends Controller
     */
 
     /**
-     * Return the currently authenticated user's profile from the JWT.
+     * whoami: Return the currently authenticated user's profile from the JWT.
+     * STRICT PARITY with api.php:2696-2707.
      *
-     * GET gateway: c=Auth&m=me
-     *
-     * Legacy mirrors:
-     *   - backend/login.php  (GET branch with valid cookie → respond_json_ok)
-     *
-     * Requires: ResolveJwtUser middleware to have run and stored claims on
-     *           the request attributes as 'jwt_claims' and 'jwt_token'.
+     * GET gateway: c=Auth&m=whoami (or legacy m=me)
      */
     public function me(Request $request): JsonResponse
     {
         /** @var array<string, mixed>|null $claims */
         $claims = $request->attributes->get('jwt_claims');
 
-        /** @var string|null $token */
-        $token = $request->attributes->get('jwt_token');
-
-        // If ResolveJwtUser found no valid token, claims will be null.
-        // Mirror legacy: respond_json_error('auth_required', 401)
-        if ($claims === null || $token === null) {
+        // Legacy: $u = require_auth();
+        if ($claims === null) {
             return response()->json([
-                'status'  => 'error',
-                'message' => 'auth_required',
-            ], 401);
+                'error' => 'auth_required'
+            ], 401, [], \JSON_UNESCAPED_UNICODE);
         }
 
-        return response()->json(
-            $this->authService->buildMeResponse($token, $claims)
-        );
+        // Legacy: 'id' => (int)($u['id'] ?? 0),
+        // (Note: $u['id'] is populated from claims['user_id'] in helper)
+        $id = isset($claims['user_id']) && is_numeric($claims['user_id']) 
+            ? (int) $claims['user_id'] 
+            : 0;
+
+        // Legacy: 'role' => $u['role'] ?? 'user'
+        $role = $claims['role'] ?? 'user';
+
+        $data = [
+            'logged_in' => true,
+            'id'        => $id,
+            // Legacy: 'username'  => $u['username'] ?? null
+            'username'  => $claims['username'] ?? null,
+            // Legacy: 'role'      => $u['role'] ?? 'user'
+            'role'      => $role,
+            // Legacy: 'is_admin'  => strtolower($u['role'] ?? '') === 'admin'
+            'is_admin'  => strtolower($role) === 'admin',
+        ];
+
+        // Legacy: header('Cache-Control: no-store');
+        return response()->json($data, 200, [
+            'Cache-Control' => 'no-store',
+        ], \JSON_UNESCAPED_UNICODE);
     }
 }

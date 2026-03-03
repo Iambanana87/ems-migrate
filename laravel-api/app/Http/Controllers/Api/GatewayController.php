@@ -126,6 +126,12 @@ class GatewayController extends Controller
         'Report.devicesActionTable' => [ReportController::class, 'devicesActionTable'],
         'Report.previewNextCodes' => [ReportController::class, 'previewNextCodes'],
         'Report.listBackendIssues' => [ReportController::class, 'listBackendIssues'],
+        'Report.countActions' => [ReportController::class, 'countActions'],
+        'Report.countDeviceStatus' => [ReportController::class, 'countDeviceStatus'],
+        'Report.countFlexible' => [ReportController::class, 'countFlexible'],
+        'Report.getTotalCount' => [ReportController::class, 'getTotalCount'],
+        'Report.getTcMeta' => [ReportController::class, 'getTcMeta'],
+        'User.listUsers' => [UserController::class, 'listUsers'],
 
         // ── [FUTURE BATCHES — ADD BELOW AS FILES ARE MIGRATED] ───────────────
         // Example:

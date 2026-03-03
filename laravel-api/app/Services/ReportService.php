@@ -1399,4 +1399,446 @@ SQL;
             'next_plan_code'   => sprintf('AP%05d', $nextPlanId),
         ];
     }
+
+    public function countActions(array $data): int
+    {
+        $proc = strtolower(trim($data['process'] ?? ''));
+        $family = trim($data['family'] ?? '');
+
+        $allowed = ['mold', 'injection', 'tuft', 'blister'];
+        $where = "WHERE da.status <> 'cancelled' AND NOT (da.status='done' AND da.approval_status='approved')";
+
+        $params = [];
+
+        $join = "JOIN devices d ON d.device_id = da.device_id";
+
+        if (in_array($proc, $allowed, true)) {
+            $where .= " AND d.display_type = :proc";
+            $params['proc'] = $proc;
+        }
+        if ($family !== '') {
+            $where .= " AND d.family = :family";
+            $params['family'] = $family;
+        }
+
+        $sql = "SELECT COUNT(*) AS c
+                FROM device_actions da
+                {$join}
+                {$where}";
+
+        $result = DB::select($sql, $params);
+        return (int)($result[0]->c ?? 0);
+    }
+
+    public function countDeviceStatus(array $data): array
+    {
+        $process_type = $data['process'] ?? 'mold';
+        $client_filter = $data['family'] ?? ''; // App.js gửi client qua param 'family'
+        $now = time();
+
+        $sql = "
+            SELECT 
+                d.device_id, d.display_type, d.client,
+                d.target_limit, d.upper_limit, d.lower_limit, d.efficiency_lower_limit, d.frequency, 
+                d.cavities AS mold_cavity,
+                ldd.live_data, ldd.last_updated
+            FROM devices d
+            LEFT JOIN live_device_data ldd ON d.device_id = ldd.device_id
+            WHERE d.display_type = :proc
+        ";
+
+        $params = [':proc' => $process_type];
+
+        // Thêm lọc theo Client nếu có
+        if ($client_filter !== '' && $client_filter !== 'all') {
+            $sql .= " AND d.client = :client";
+            $params[':client'] = $client_filter;
+        }
+
+        $devices = DB::select($sql, $params);
+
+        $counts = ['total' => 0, 'connected' => 0, 'normal' => 0, 'breached' => 0, 'disconnected' => 0];
+
+        foreach ($devices as $row) {
+            $device = (array) $row;
+            $counts['total']++;
+            $live = json_decode($device['live_data'] ?? '{}', true) ?: [];
+
+            // Tính heartbeat
+            $ts = isset($live['datetime']) ? strtotime($live['datetime']) : (!empty($device['last_updated']) ? strtotime($device['last_updated']) : 0);
+            $freq = (int)($device['frequency'] ?? 300) ?: 300;
+
+            if ($ts > 0 && ($now - $ts) <= $freq) {
+                // Đang Online -> Check vi phạm (Breached)
+                $isBreached = false;
+                $eff = 0; $val = 0;
+
+                if ($process_type === 'mold') {
+                    $res = $this->calculateMoldMetrics($live, $device);
+                    $eff = $res['efficiency'];
+                    $val = (float)($live['cycle_time'] ?? 0);
+                } elseif ($process_type === 'tuft') {
+                    $res = $this->calculateTuftMetrics($live, $device);
+                    $eff = $res['efficiency'];
+                    $val = (float)($live['output'] ?? $live['rate'] ?? 0);
+                } elseif ($process_type === 'blister') {
+                    $res = $this->calculateBlisterMetrics($live, $device);
+                    $eff = $res['efficiency'];
+                    $val = (float)($live['cyclecount'] ?? 0);
+                }
+
+                if (((float)$device['efficiency_lower_limit'] > 0 && $eff < (float)$device['efficiency_lower_limit']) ||
+                    ((float)$device['lower_limit'] > 0 && $val > 0 && $val < (float)$device['lower_limit']) ||
+                    ((float)$device['upper_limit'] > 0 && $val > (float)$device['upper_limit'])) {
+                    $isBreached = true;
+                }
+
+                if ($isBreached) $counts['breached']++; else $counts['normal']++;
+            } else {
+                $counts['disconnected']++;
+            }
+        }
+        $counts['connected'] = $counts['normal'] + $counts['breached'];
+        return $counts;
+    }
+
+    private function calculateMoldMetrics(array $live, array $device) {
+        // Đầu vào cần: target (sec/shot), mold_cavity, current_cycle (sec/shot), actual_cavity
+        $targetSec     = (float)($device['target'] ?? $device['target_limit'] ?? 0); // giây/shot
+        $moldCavity    = (int)  ($device['mold_cavity'] ?? $device['cavities'] ?? 0);
+        $currentSec    = (float)($live['cycle_time'] ?? $device['current_cycle'] ?? 0);
+        $actualCavity  = (int)  ($live['cavities'] ?? $device['actual_cavity'] ?? $moldCavity);
+
+        // Năng lực lý thuyết và thực tế (pcs/giờ)
+        $capacityPerHour = ($targetSec > 0 && $moldCavity > 0) ? (3600 / $targetSec) * $moldCavity : 0;
+        $actualPerHour   = ($currentSec > 0 && $actualCavity > 0) ? (3600 / $currentSec) * $actualCavity : 0;
+
+        // Hiệu suất (%)
+        $efficiency = ($capacityPerHour > 0) ? ($actualPerHour / $capacityPerHour) * 100 : 0;
+
+        // Mất sản lượng (pcs) — không âm
+        $lossPcs = max(0, $capacityPerHour - $actualPerHour);
+
+        // Quy đổi "lost time" (phút) theo tốc độ target
+        $targetPerMin = ($targetSec > 0 && $moldCavity > 0) ? (60 / $targetSec) * $moldCavity : 0;
+        $idleMins     = ($targetPerMin > 0) ? ($lossPcs / $targetPerMin) : 0;
+
+        return [
+            'efficiency'     => round($efficiency, 2),
+            'loss_pcs'       => round($lossPcs, 2),
+            'idle_breakdown' => round($idleMins, 2),
+        ];
+    }
+
+    private function calculateTuftMetrics(array $live, array $device) {
+        // target_per_min: cấu hình pcs/phút (devices.target_limit)
+        $targetPerMin = (float)($device['target'] ?? $device['target_limit'] ?? 0); // ví dụ 20
+        // actual_per_min: live output pcs/phút
+        $actualPerMin = (float)($live['output'] ?? 0);
+
+        // Efficiency (%)
+        $eff = ($targetPerMin > 0) ? ($actualPerMin / $targetPerMin) * 100 : 0;
+
+        // Công suất/giờ
+        $capacityPerHour = (float)($device['capacity_per_hr'] ?? 0);
+        if ($capacityPerHour <= 0 && $targetPerMin > 0) {
+            $capacityPerHour = $targetPerMin * 60;
+        }
+        $actualPerHour = $actualPerMin * 60;
+
+        // Mất pcs & thời gian quy đổi (phút)
+        $lossPcs   = max(0, $capacityPerHour - $actualPerHour);
+        $idleMins  = ($targetPerMin > 0) ? ($lossPcs / $targetPerMin) : 0;
+
+        return [
+            'efficiency'     => round($eff, 2),
+            'loss_pcs'       => round($lossPcs, 2),
+            'idle_breakdown' => round($idleMins, 2),
+        ];
+    }
+
+    private function calculateBlisterMetrics(array $live, array $device) {
+        // 1) Tham số từ cấu hình
+        $targetCyclesPerMin = (float)($device['target'] ?? $device['target_limit'] ?? 0); // cycles/phút
+        $brushesPerCycle = (int)($device['brushes_per_cycle']
+                        ?? $live['BrushesperCycle']
+                        ?? $live['BrushesPerCycle']
+                        ?? $live['brushes_per_cycle']
+                        ?? 0);
+
+        // Nếu không có brushesPerCycle nhưng có capacity và target, suy ra bpc ~ capacity/(target*60)
+        if ($brushesPerCycle <= 0 && $targetCyclesPerMin > 0 && !empty($device['capacity_per_hr'])) {
+            $brushesPerCycle = (int)round($device['capacity_per_hr'] / ($targetCyclesPerMin * 60));
+        }
+        if ($brushesPerCycle <= 0) $brushesPerCycle = 1; // tránh chia 0
+
+        // 2) Mục tiêu & thực tế theo pcs/phút
+        $targetPerMinPcs = $targetCyclesPerMin * $brushesPerCycle;             // pcs/phút
+
+        // actual pcs/phút: ưu tiên live 'output', nếu không có -> cyclecount * brushes_per_cycle (chấp nhận key khác nhau)
+        $cycleCount = (float)($live['cyclecount'] ?? $live['cycle_count'] ?? $live['CycleCount'] ?? 0);
+        $actualPerMinPcs = isset($live['output'])
+            ? (float)$live['output']
+            : $cycleCount * $brushesPerCycle;
+
+        // 3) Efficiency
+        $efficiency = ($targetPerMinPcs > 0) ? ($actualPerMinPcs / $targetPerMinPcs) * 100 : 0;
+
+        // 4) Mất sản lượng/giờ
+        $capacityPerHour = (float)($device['capacity_per_hr'] ?? 0);
+        if ($capacityPerHour <= 0 && $targetPerMinPcs > 0) {
+            $capacityPerHour = $targetPerMinPcs * 60;
+        }
+        $actualPerHour = $actualPerMinPcs * 60;
+        $lossPcs = max(0, $capacityPerHour - $actualPerHour);
+
+        // 5) Lost time (phút) — CHIA CHO pcs/phút (đúng), không phải cycles/phút
+        $idleMins = ($targetPerMinPcs > 0) ? ($lossPcs / $targetPerMinPcs) : 0;
+
+        return [
+            'efficiency'     => round($efficiency, 2),
+            'loss_pcs'       => round($lossPcs, 2),
+            'idle_breakdown' => round($idleMins, 2),
+        ];
+    public function countFlexible(array $data): int
+    {
+        $proc = strtolower(trim($data['process'] ?? ''));
+        $family = trim($data['family'] ?? '');
+
+        $allowed = ['mold', 'injection', 'tuft', 'blister'];
+        $where = "WHERE flex = '1'";
+        $params = [];
+
+        if (in_array($proc, $allowed, true)) {
+            $where .= " AND display_type = :proc";
+            $params[':proc'] = $proc;
+        }
+
+        if ($family !== '') {
+            $where .= " AND family = :family";
+            $params[':family'] = $family;
+        }
+
+        $sql = "SELECT COUNT(*) AS c FROM devices {$where}";
+        $result = DB::select($sql, $params);
+
+        return (int)($result[0]->c ?? 0);
+    }
+
+    public function getTotalCount(array $data): array
+    {
+        $recalc = (isset($data['recalc']) && $data['recalc'] == '1');
+        $onlyDeviceId = $data['device_id'] ?? null;
+
+        // === NHÁNH NHẸ: READ-ONLY ===
+        if (!$recalc) {
+            $fields = "device_id, display_type, total_count, unit, 
+                       cavity_count, total_rpm, total_cycle";
+            
+            $sql = "SELECT $fields FROM devices";
+            $params = [];
+            
+            if ($onlyDeviceId) {
+                $sql .= " WHERE device_id = ?";
+                $params[] = $onlyDeviceId;
+            }
+            
+            $rows = DB::select($sql, $params);
+
+            $finalDevices = array_map(function($r) {
+                $r = (array)$r;
+                return [
+                    'device_id'    => (string)$r['device_id'],
+                    'display_type' => (string)$r['display_type'],
+                    'total_count'  => (int)$r['total_count'],
+                    'unit'         => (string)$r['unit'],
+                    'cavity_count' => is_numeric($r['cavity_count']) ? (int)$r['cavity_count'] : null,
+                    'total_rpm'    => is_numeric($r['total_rpm']) ? (int)$r['total_rpm'] : null,
+                    'total_cycle'  => is_numeric($r['total_cycle']) ? (int)$r['total_cycle'] : null,
+                    'updated'      => false
+                ];
+            }, $rows);
+
+            if ($onlyDeviceId && empty($finalDevices)) {
+                return ['error' => 'not_found', 'code' => 404];
+            }
+
+            return [
+                'status'  => 'ok',
+                'updated' => 0,
+                'devices' => $finalDevices
+            ];
+        }
+
+        // === NHÁNH NẶNG: INCREMENTAL UPDATE ===
+        $lockKey = 'ems_total_count_inc_lock';
+        $gotLock = false;
+        try {
+            $lockResult = DB::select("SELECT GET_LOCK(?, 3) AS lock_status", [$lockKey]);
+            $gotLock = (bool)($lockResult[0]->lock_status ?? false);
+        } catch (\Throwable $e) { }
+
+        try {
+            DB::beginTransaction();
+
+            $sqlDev = "SELECT device_id, display_type, total_count, unit, total_cycle,
+                              COALESCE(total_count_updated_at, '2000-01-01 00:00:00') as last_update,
+                              COALESCE(history_count, 0) as history_count,
+                              cavities, hole_per_brush
+                       FROM devices";
+            
+            $paramsDev = [];
+            if ($onlyDeviceId) {
+                $sqlDev .= " WHERE device_id = ?";
+                $paramsDev[] = $onlyDeviceId;
+            }
+            
+            $devices = DB::select($sqlDev, $paramsDev);
+
+            $changedCount = 0;
+            $resultList  = [];
+            $nowTime = date('Y-m-d H:i:s');
+
+            foreach ($devices as $d) {
+                $d = (array)$d;
+                $eid = $d['device_id'];
+                $type = strtolower($d['display_type'] ?? '');
+                $lastUpdate = $d['last_update'];
+                $isFirstRun = ($lastUpdate === '2000-01-01 00:00:00');
+
+                $currentTotal = (float)($d['total_count'] ?? 0);
+                $currentTotalCycle = (float)($d['total_cycle'] ?? 0);
+                $history = (int)$d['history_count'];
+                
+                $addedValue = 0;
+                $addedCycle = 0;
+                $unit = $d['unit'] ?: ($type === 'mold' ? 'shot' : 'pcs');
+
+                if ($type === 'mold') {
+                    $res = DB::select("SELECT COUNT(*) AS c FROM mold WHERE mold_id = ? AND datetime > ? AND cycle_time >= 20", [$eid, $lastUpdate]);
+                    $addedValue = (int)($res[0]->c ?? 0);
+                    if (!$d['unit']) $unit = 'shot';
+                } 
+                elseif ($type === 'tuft') {
+                    $res = DB::select("SELECT COALESCE(SUM(output), 0) AS c FROM tuft WHERE device_id = ? AND datetime > ?", [$eid, $lastUpdate]);
+                    $addedValue = (int)($res[0]->c ?? 0);
+                    if (!$d['unit']) $unit = 'pcs';
+                } 
+                elseif ($type === 'blister') {
+                    $resOut = DB::select("SELECT COALESCE(SUM(output), 0) AS c FROM blister WHERE device_id = ? AND datetime > ?", [$eid, $lastUpdate]);
+                    $addedValue = (int)($resOut[0]->c ?? 0);
+                    
+                    $resCyc = DB::select("SELECT COALESCE(SUM(cyclecount), 0) AS c FROM blister WHERE device_id = ? AND datetime > ?", [$eid, $lastUpdate]);
+                    $addedCycle = (int)($resCyc[0]->c ?? 0);
+                    if (!$d['unit']) $unit = 'pcs';
+                }
+
+                if ($isFirstRun) {
+                    $newTotal = $history + $addedValue;
+                    $newTotalCycle = ($type === 'blister') ? $addedCycle : 0; 
+                } else {
+                    $newTotal = $currentTotal + $addedValue;
+                    $newTotalCycle = ($type === 'blister') ? ($currentTotalCycle + $addedCycle) : 0;
+                }
+
+                $cavities = (int)($d['cavities'] ?? 0);
+                $holes    = (int)($d['hole_per_brush'] ?? 0);
+
+                $isMold = ($type === 'mold') ? 1 : 0;
+                $isTuft = ($type === 'tuft') ? 1 : 0;
+                $isBlister = ($type === 'blister') ? 1 : 0;
+
+                $jsonCavity = $isMold ? ($newTotal * $cavities) : null;
+                $jsonRpm    = $isTuft ? ($newTotal * $holes)    : null;
+                $jsonCycle  = $isBlister ? $newTotalCycle       : null;
+
+                $sqlCavity = $jsonCavity ?: 0;
+                $sqlRpm    = $jsonRpm ?: 0;
+                $sqlCycle  = $jsonCycle ?: 0;
+
+                DB::statement("
+                    UPDATE devices SET 
+                        total_count = :new_total,
+                        unit = :unit,
+                        total_count_updated_at = :now_time,
+                        
+                        cavity_count = IF(:is_mold_1=1, :cavity_count, cavity_count),
+                        cavity_count_updated_at = IF(:is_mold_2=1, :now_time_2, cavity_count_updated_at),
+
+                        total_rpm = IF(:is_tuft_1=1, :total_rpm, total_rpm),
+                        total_rpm_updated_at = IF(:is_tuft_2=1, :now_time_3, total_rpm_updated_at),
+
+                        total_cycle = IF(:is_blister_1=1, :total_cycle, total_cycle),
+                        total_cycle_updated_at = IF(:is_blister_2=1, :now_time_4, total_cycle_updated_at)
+                    WHERE device_id = :eid
+                ", [
+                    'new_total' => $newTotal,
+                    'unit'      => $unit,
+                    'now_time'  => $nowTime,
+                    'is_mold_1'   => $isMold,
+                    'cavity_count' => $sqlCavity,
+                    'is_mold_2'   => $isMold,
+                    'now_time_2'  => $nowTime,
+                    'is_tuft_1'   => $isTuft,
+                    'total_rpm' => $sqlRpm,
+                    'is_tuft_2'   => $isTuft,
+                    'now_time_3'  => $nowTime,
+                    'is_blister_1'=> $isBlister,
+                    'total_cycle'=> $sqlCycle,
+                    'is_blister_2'=> $isBlister,
+                    'now_time_4'  => $nowTime,
+                    'eid'       => $eid
+                ]);
+
+                $isUpdated = ($addedValue > 0 || $addedCycle > 0);
+                if ($isUpdated) $changedCount++;
+
+                $resultList[] = [
+                    'device_id'    => (string)$eid,
+                    'display_type' => (string)$type,
+                    'total_count'  => (int)$newTotal,
+                    'unit'         => (string)$unit,
+                    'cavity_count' => $jsonCavity !== null ? (int)$jsonCavity : null,
+                    'total_rpm'    => $jsonRpm !== null ? (int)$jsonRpm : null,
+                    'total_cycle'  => $jsonCycle !== null ? (int)$jsonCycle : null,
+                    'updated'      => $isUpdated
+                ];
+            }
+
+            DB::commit();
+
+            if ($gotLock) {
+                try { DB::statement("SELECT RELEASE_LOCK(?)", [$lockKey]); } catch (\Throwable $e) {}
+            }
+
+            return [
+                'status'  => 'ok',
+                'updated' => $changedCount,
+                'devices' => $resultList
+            ];
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            if ($gotLock) {
+                try { DB::statement("SELECT RELEASE_LOCK(?)", [$lockKey]); } catch (\Throwable $e2) {}
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * tc_meta: returns the latest update timestamp and server time.
+     * STRICT PARITY with api.php:3351-3369.
+     */
+    public function getTcMeta(): array
+    {
+        $row = DB::select("SELECT MAX(total_count_updated_at) AS updated_at FROM devices");
+        $updatedAt = $row[0]->updated_at ?? null;
+
+        return [
+            'db_updated_at' => $updatedAt,
+            'server_now'    => date('Y-m-d H:i:s'),
+            'tz'            => date_default_timezone_get(),
+        ];
+    }
 }

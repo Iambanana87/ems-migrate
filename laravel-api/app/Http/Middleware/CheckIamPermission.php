@@ -57,6 +57,38 @@ class CheckIamPermission
         /** @var array<string, mixed>|null $claims */
         $claims = $request->attributes->get('jwt_claims');
 
+        // ── Step 1.5: Public Actions Bypass ────────────────────────────────
+        // Certain actions are explicitly public in legacy and must remain so.
+        $c = (string)$request->query('c', '');
+        $m = (string)$request->query('m', '');
+        $key = "{$c}.{$m}";
+
+        $publicActions = [
+            'Family.index',
+            'Device.details',
+            'Report.summary',
+            'Report.output',
+            'Report.outputBulk',
+            'Report.efficiency',
+            'Device.history',
+            'Report.hourly',
+            'Report.actionsBoard',
+            'Report.devicesActionTable',
+            'DeviceAction.listV2',
+            'DeviceAction.listActionPlans',
+            'Report.countActions',
+            'Report.countDeviceStatus',
+            'Report.countFlexible',
+            'Report.getTotalCount',
+            'Report.getTcMeta',
+            'User.listUsers',
+            'Auth.me', // Handled manually for strict 401 parity
+        ];
+
+        if (in_array($key, $publicActions, true)) {
+            return $next($request);
+        }
+
         // ── Step 2: No JWT → transparent pass-through ────────────────────────
         // Public endpoints (Device.live, Family.index, ApStatus.index) work fine.
         // Protected endpoints will be blocked later by RequiresAuth::requireRole().
