@@ -1,0 +1,98 @@
+[
+    {
+        "name": "actions_board",
+        "migrated": true
+    },
+    {
+        "name": "approve_action",
+        "migrated": false
+    },
+    {
+        "name": "count_actions",
+        "migrated": false
+    },
+    {
+        "name": "count_device_status",
+        "migrated": false
+    },
+    {
+        "name": "count_flexible",
+        "migrated": false
+    },
+    {
+        "name": "create_device_action",
+        "migrated": false
+    },
+    {
+        "name": "devices_action_table",
+        "migrated": true
+    },
+    {
+        "name": "get_efficiency_report_data",
+        "migrated": true
+    },
+    {
+        "name": "get_families",
+        "migrated": true
+    },
+    {
+        "name": "get_hourly_report",
+        "migrated": true
+    },
+    {
+        "name": "get_machine_details",
+        "migrated": true
+    },
+    {
+        "name": "get_output_report",
+        "migrated": true
+    },
+    {
+        "name": "get_output_report_bulk",
+        "migrated": true
+    },
+    {
+        "name": "get_summary_report",
+        "migrated": true
+    },
+    {
+        "name": "get_total_count",
+        "migrated": false
+    },
+    {
+        "name": "list_action_plans",
+        "migrated": true
+    },
+    {
+        "name": "list_device_actions_v2",
+        "migrated": true
+    },
+    {
+        "name": "list_users",
+        "migrated": false
+    },
+    {
+        "name": "reject_action",
+        "migrated": false
+    },
+    {
+        "name": "search_device",
+        "migrated": true
+    },
+    {
+        "name": "tc_meta",
+        "migrated": false
+    },
+    {
+        "name": "update_action_status",
+        "migrated": false
+    },
+    {
+        "name": "update_device_action_status",
+        "migrated": false
+    },
+    {
+        "name": "whoami",
+        "migrated": false
+    }
+]

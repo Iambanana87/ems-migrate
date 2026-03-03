@@ -149,4 +149,30 @@ class ReportController extends Controller
             ], $code, [], \JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function previewNextCodes(\App\Http\Requests\DeviceAction\PreviewNextCodesRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->reportService->previewNextCodes();
+            return response()->json($data, 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 500, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function listBackendIssues(\App\Http\Requests\Report\ListBackendIssuesRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->reportService->listBackendIssues($request->all());
+            return response()->json($data, 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 500, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
 }

@@ -102,14 +102,29 @@ class CheckIamPermission
         $m   = (string) $request->query('m', '');
         $key = "c={$c}&m={$m}";
 
+        $candidates = [$key];
+
+        // ── Step 5.5: Legacy Parity Mapping ────────────────────────────────
+        // Support legacy URI-style permission patterns if specified in user requirements.
+        if ($c === 'Report' && $m === 'previewNextCodes') {
+            $candidates[] = '/ems/api.php?action=preview_next_codes';
+        }
+
+        if ($c === 'Report' && $m === 'listBackendIssues') {
+            $candidates[] = '/ems/api.php?action=list_backend_issues';
+        }
+
         // ── Step 6 & 7: Pattern match ──────────────────────────────────────
         foreach ($patterns as $pattern) {
             if (! is_string($pattern)) {
                 continue;
             }
-            // fnmatch supports '*' wildcard — e.g. "c=Device&m=*" matches any Device action
-            if (fnmatch($pattern, $key, FNM_CASEFOLD)) {
-                return $next($request);
+
+            foreach ($candidates as $cand) {
+                // fnmatch supports '*' wildcard — e.g. "c=Device&m=*" matches any Device action
+                if (fnmatch($pattern, $cand, FNM_CASEFOLD)) {
+                    return $next($request);
+                }
             }
         }
 

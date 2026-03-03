@@ -1,0 +1,48 @@
+﻿
+Fatal error: Uncaught PDOException: SQLSTATE[HY000] [1049] Unknown database 'ems' in C:\xampp\htdocs\ems\test_delete_scenarios.php:3
+Stack trace:
+#0 C:\xampp\htdocs\ems\test_delete_scenarios.php(3): PDO->__construct('mysql:host=loca...', 'root', Object(SensitiveParameterValue))
+#1 {main}
+  thrown in C:\xampp\htdocs\ems\test_delete_scenarios.php on line 3
+php : PHP Fatal 
+error:  Uncaught 
+PDOException: 
+SQLSTATE[HY000] 
+[1049] Unknown 
+database 'ems' in C:\
+xampp\htdocs\ems\test
+_delete_scenarios.php
+:3
+At line:1 char:1
++ php c:\xampp\htdocs
+\ems\test_delete_scen
+arios.php > 
+c:\xampp\htdocs\e ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (PHP Fat   
+ al error...scena    
+rios.php:3:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Stack trace:
+#0 C:\xampp\htdocs\em
+s\test_delete_scenari
+os.php(3): PDO->__con
+struct('mysql:host=lo
+ca...', 'root', Objec
+t(SensitiveParameterV
+alue))
+#1 {main}
+  thrown in C:\xampp\
+htdocs\ems\test_delet
+e_scenarios.php on 
+line 3

@@ -1288,4 +1288,115 @@ class ReportService
             'idle_24_min'     => $idle_24_min,
         ];
     }
+
+    public function listBackendIssues(array $data): array
+    {
+        $display = $data['display_type'] ?? 'all';
+        $where   = '';
+        $params  = [];
+        if ($display !== 'all') {
+            $where   = ' AND d.display_type = ? ';
+            $params[] = $display;
+        }
+
+        $sql = <<<SQL
+SELECT
+  a.id                                                   AS action_pk,
+  d.display_type                                         AS type,                       -- Machine Type
+  a.device_id                                            AS device,                     -- Device
+  a.issue_type                                           AS issue_type,                 -- Issue Type
+  COALESCE(a.action_code, CONCAT('AC', LPAD(a.id,5,'0'))) AS issue_id,                  -- Issue ID
+  COALESCE(JSON_UNQUOTE(JSON_EXTRACT(a.short_form, '$[0].value')), a.title, '') AS description_of_issue,
+  a.created_at                                           AS created_at,                 -- Created Day
+
+  /* KHÔNG dùng due_date nữa: chỉ lấy từ các kế hoạch */
+  COALESCE(p_next.est_date, p_last.est_date)             AS planned_completion_date,    -- Planned completion date
+
+  COALESCE(u.username, '')                               AS created_by,                 -- Creator
+  a.status                                               AS action_status,              -- raw status (tham khảo)
+  a.approval_status                                      AS approval_status,            -- raw approval (tham khảo)
+
+  CASE                                                   -- Status hiển thị (Complete/In progress)
+    WHEN COALESCE(c.plans_total,0) > 0
+     AND COALESCE(c.plans_done,0)  = COALESCE(c.plans_total,0)
+    THEN 'complete' ELSE 'in_progress'
+  END                                                    AS status_display,
+
+  COALESCE(c.plans_done,0)                               AS plans_done,                 -- Action plans (done/total)
+  COALESCE(c.plans_total,0)                              AS plans_total,
+
+  -- (thông tin tham khảo)
+  COALESCE(d.product, 'Common')                          AS product,
+  d.process                                              AS process
+
+FROM device_actions a
+JOIN devices d ON d.device_id = a.device_id
+LEFT JOIN users u ON u.id = a.created_by_user_id
+
+/* Kế hoạch OPEN gần nhất (est_date nhỏ nhất) nếu có */
+LEFT JOIN (
+  SELECT x.action_id, x.plan_text, x.est_date
+  FROM device_action_plans x
+  JOIN (
+    SELECT action_id, MIN(est_date) AS est_date
+    FROM device_action_plans
+    WHERE (status IS NULL OR status <> 'done') AND est_date IS NOT NULL
+    GROUP BY action_id
+  ) y ON y.action_id = x.action_id AND y.est_date = x.est_date
+) p_next ON p_next.action_id = a.id
+
+/* Nếu không có OPEN thì lấy kế hoạch DONE muộn nhất */
+LEFT JOIN (
+  SELECT x.action_id, x.plan_text, x.est_date
+  FROM device_action_plans x
+  JOIN (
+    SELECT action_id, MAX(est_date) AS est_date
+    FROM device_action_plans
+    WHERE status = 'done' AND est_date IS NOT NULL
+    GROUP BY action_id
+  ) y ON y.action_id = x.action_id AND y.est_date = x.est_date
+) p_last ON p_last.action_id = a.id
+
+/* Đếm kế hoạch */
+LEFT JOIN (
+  SELECT action_id,
+         SUM(status='done') AS plans_done,
+         COUNT(*)           AS plans_total
+  FROM device_action_plans
+  GROUP BY action_id
+) c ON c.action_id = a.id
+
+WHERE a.status <> 'cancelled' {$where}
+ORDER BY d.display_type, a.device_id,
+         planned_completion_date IS NULL, planned_completion_date
+SQL;
+
+        return array_map(function ($row) {
+            return (array) $row;
+        }, DB::select($sql, $params));
+    }
+
+    public function previewNextCodes(): array
+    {
+        $st1 = "
+            SELECT AUTO_INCREMENT FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_actions'
+        ";
+        $nextActionIdRaw = DB::select($st1);
+        $nextActionId = (int)($nextActionIdRaw[0]->AUTO_INCREMENT ?? 0);
+
+        $st2 = "
+            SELECT AUTO_INCREMENT FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_action_plans'
+        ";
+        $nextPlanIdRaw = DB::select($st2);
+        $nextPlanId = (int)($nextPlanIdRaw[0]->AUTO_INCREMENT ?? 0);
+
+        return [
+            'next_action_id'   => $nextActionId,
+            'next_action_code' => sprintf('ISS%05d', $nextActionId),
+            'next_plan_id'     => $nextPlanId,
+            'next_plan_code'   => sprintf('AP%05d', $nextPlanId),
+        ];
+    }
 }

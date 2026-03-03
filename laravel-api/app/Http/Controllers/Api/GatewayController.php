@@ -103,7 +103,9 @@ class GatewayController extends Controller
         'DeviceAction.listV2' => [DeviceActionController::class, 'listV2'],
         'DeviceAction.listActionPlans' => [DeviceActionController::class, 'listActionPlans'],
         'DeviceAction.updateActionPlanStatus' => [DeviceActionController::class, 'updateActionPlanStatus'],
-        'DeviceAction.deleteActionPlan' => [DeviceActionController::class, 'deleteActionPlan'],  // admin
+        'DeviceAction.deleteActionPlan' => [DeviceActionController::class, 'deleteActionPlan'],
+        'DeviceAction.bulkUpdateActionPlanStatus' => [DeviceActionController::class, 'bulkUpdateActionPlanStatus'],
+  // admin
 
         // ── Device Status (manual override) ────────────────────────────────────
         // Legacy: backend/backend.php (?action=update_device_status)
@@ -122,6 +124,8 @@ class GatewayController extends Controller
         'Report.hourly'     => [ReportController::class, 'hourly'],
         'Report.actionsBoard' => [ReportController::class, 'actionsBoard'],
         'Report.devicesActionTable' => [ReportController::class, 'devicesActionTable'],
+        'Report.previewNextCodes' => [ReportController::class, 'previewNextCodes'],
+        'Report.listBackendIssues' => [ReportController::class, 'listBackendIssues'],
 
         // ── [FUTURE BATCHES — ADD BELOW AS FILES ARE MIGRATED] ───────────────
         // Example:

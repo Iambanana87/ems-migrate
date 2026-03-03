@@ -648,4 +648,101 @@ final class DeviceActionService
             }
         });
     }
+
+    public function bulkUpdateActionPlanStatus(array $data, string $who): array
+    {
+        $actionId = (int)($data['action_id'] ?? 0);
+        $status   = (strtolower((string)($data['status'] ?? 'done')) === 'open') ? 'open' : 'done';
+
+        if ($actionId <= 0) {
+            throw new \Exception('Missing action_id', 400);
+        }
+
+        return DB::transaction(function () use ($actionId, $status, $who): array {
+            // BEFORE: lấy map plan_id => status
+            $st1 = "SELECT id, status FROM device_action_plans WHERE action_id = ?";
+            $plansBeforeRaw = DB::select($st1, [$actionId]);
+            $beforeMap = [];
+            foreach ($plansBeforeRaw as $r) {
+                $r = (array)$r;
+                $beforeMap[(string)$r['id']] = $r['status'];
+            }
+
+            // UPDATE hàng loạt
+            $st2 = "UPDATE device_action_plans SET status=:st WHERE action_id=:aid";
+            $affected = DB::update($st2, [':st' => $status, ':aid' => $actionId]);
+
+            // AFTER: lấy lại map plan_id => status
+            $plansAfterRaw = DB::select($st1, [$actionId]);
+            $afterMap = [];
+            foreach ($plansAfterRaw as $r) {
+                $r = (array)$r;
+                $afterMap[(string)$r['id']] = $r['status'];
+            }
+
+            // Recalc trạng thái ISSUE cha (giống logic ở update_action_plan_status)
+            $stAgg = "SELECT SUM(status='done') AS done, COUNT(*) AS total FROM device_action_plans WHERE action_id=?";
+            $aggRaw = DB::select($stAgg, [$actionId]);
+            $agg = empty($aggRaw) ? null : (array)$aggRaw[0];
+
+            $parentStatus = null;
+            if ($agg && (int)$agg['total'] > 0) {
+                if ((int)$agg['done'] === 0) {
+                    DB::update("UPDATE device_actions SET status='open' WHERE id=?", [$actionId]);
+                    $parentStatus = 'open';
+                } elseif ((int)$agg['done'] < (int)$agg['total']) {
+                    DB::update("UPDATE device_actions SET status='in_progress' WHERE id=?", [$actionId]);
+                    $parentStatus = 'in_progress';
+                } else {
+                    DB::update("
+                        UPDATE device_actions
+                           SET status='done',
+                               approval_status = CASE WHEN approval_status='approved'
+                                                      THEN 'approved' ELSE 'pending' END
+                         WHERE id=?", [$actionId]);
+                    $parentStatus = 'done';
+                }
+            }
+
+            // AUDIT
+            $this->audit->log(
+                'update',
+                'device_action_plans:bulk_update_status#' . $actionId,
+                ['plan_statuses' => $beforeMap],
+                ['plan_statuses' => $afterMap, 'parent_action_status_after' => $parentStatus],
+                $who
+            );
+
+            return [
+                'status'        => 'success',
+                'updated_rows'  => $affected,
+                'parent_status' => $parentStatus
+            ];
+        });
+    }
+
+    public function previewNextCodes(): array
+    {
+        $st1 = "
+            SELECT AUTO_INCREMENT FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_actions'
+        ";
+        $nextActionIdRaw = DB::select($st1);
+        $nextActionId = empty($nextActionIdRaw) ? 1 : (int) ((array)$nextActionIdRaw[0])['AUTO_INCREMENT'];
+
+        $st2 = "
+            SELECT AUTO_INCREMENT FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_action_plans'
+        ";
+        $nextPlanIdRaw = DB::select($st2);
+        $nextPlanId = empty($nextPlanIdRaw) ? 1 : (int) ((array)$nextPlanIdRaw[0])['AUTO_INCREMENT'];
+
+        return [
+            'next_action_id'   => $nextActionId,
+            'next_action_code' => sprintf('ISS%05d', $nextActionId),
+            'next_plan_id'     => $nextPlanId,
+            'next_plan_code'   => sprintf('AP%05d', $nextPlanId),
+        ];
+    }
 }
+

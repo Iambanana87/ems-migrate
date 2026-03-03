@@ -1,0 +1,14 @@
+count_actions
+devices_action_table
+actions_board
+create_device_action
+update_device_action_status
+update_action_status
+update_action_plan_status
+delete_action_plan
+approve_action
+reject_action
+bulk_update_action_plan_status
+create_action_public
+list_device_actions_v2
+list_action_plans

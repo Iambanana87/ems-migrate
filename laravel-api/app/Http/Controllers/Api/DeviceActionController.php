@@ -260,4 +260,47 @@ class DeviceActionController extends Controller
             return response()->json(['error' => $e->getMessage()], 500, [], \JSON_UNESCAPED_UNICODE);
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | m=bulk_update_action_plan_status
+    |--------------------------------------------------------------------------
+    | Logic parity: Legacy api.php uses $_POST['action_id'] and $_POST['status']
+    */
+    public function bulkUpdateActionPlanStatus(\App\Http\Requests\DeviceAction\BulkUpdateActionPlanStatusRequest $request): JsonResponse
+    {
+        $claims = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
+        $whoId  = (int)($claims['id'] ?? 0);
+        $who    = $claims['username'] ?? ('user-' . $whoId);
+
+        try {
+            $data = $this->actionService->bulkUpdateActionPlanStatus($request->validated(), $who);
+            return response()->json($data, 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            $code = $e->getCode();
+            if ($code < 400 || $code > 599) {
+                $code = 500;
+            }
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], $code, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | m=preview_next_codes
+    |--------------------------------------------------------------------------
+    | Legacy: returns AUTO_INCREMENT for device_actions and device_action_plans
+    */
+    public function previewNextCodes(\App\Http\Requests\DeviceAction\PreviewNextCodesRequest $request): JsonResponse
+    {
+        $claims = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
+
+        try {
+            $data = $this->actionService->previewNextCodes();
+            return response()->json($data, 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
 }
+
