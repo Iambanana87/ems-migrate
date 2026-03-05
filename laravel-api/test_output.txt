@@ -1,0 +1,20 @@
+﻿Testing machine_details.mold... OK
+Testing machine_details.tuft... OK
+Testing machine_details.blister... OK
+Testing tc_meta... OK
+Testing count_actions... OK
+Testing count_device_status... OK
+Testing count_flexible... OK
+Testing get_families... OK
+Testing search_device... OK
+Testing get_summary_report... OK
+Testing get_output_report... OK
+Testing get_output_report_bulk... OK
+Testing get_efficiency_report_data... OK
+Testing get_hourly_report... OK
+Testing actions_board... OK
+Testing devices_action_table... OK
+Testing list_users... FAIL [HTTP 401]
+URL: http://localhost:8000/api/gateway?c=User&m=listUsers
+
+{"error":"auth_required"}

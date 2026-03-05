@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\CheckIamPermission;
+use App\Http\Middleware\EnsureNumericJson;
 use App\Http\Middleware\ResolveJwtUser;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -52,8 +53,15 @@ return Application::configure(basePath: dirname(__DIR__))
         // Legacy: header("Access-Control-Allow-Origin: *")
         // In production, restrict allowed_origins to your Vue app domain.
         // Controlled via config/cors.php (see cors.php companion file).
+        // ── Global JSON Numeric Encoding ──────────────────────────────────
+        // Replicates legacy api.php's JSON_NUMERIC_CHECK flag globally.
+        // Every JsonResponse is re-encoded so numeric strings become native
+        // int/float values. StreamedResponse is skipped safely.
+        // Must run LAST (outermost wrap) so it catches all JSON responses
+        // including those produced by exception handlers.
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+            EnsureNumericJson::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

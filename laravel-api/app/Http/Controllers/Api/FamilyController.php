@@ -28,26 +28,68 @@ class FamilyController extends Controller
     */
 
     /**
-     * GET /api/gateway?c=Family&m=index
+     * GET /api/gateway?c=Family&m=index[&process=mold]
      *
-     * Legacy: SELECT DISTINCT process FROM devices WHERE process IS NOT NULL
-     *         ORDER BY process ASC
+     * ── LEGACY SQL (api.php:884) ──────────────────────────────────────────
+     * SELECT DISTINCT product FROM devices
+     * WHERE display_type = ?           -- bound to $_GET['process'] ?? 'mold'
+     *   AND product IS NOT NULL
+     *   AND product != ''
+     * ORDER BY product ASC
      *
-     * Response: { "status": "ok", "data": ["Injection", "Tufting", "Blister"] }
+     * ── DRIFT ROOT CAUSE (Phase B investigation, 2026-03-05) ─────────────
+     * Three differences from the previous Laravel implementation:
+     *
+     *   1. COLUMN: Legacy selects `product`. Laravel was selecting `process`.
+     *              These are different columns — product is the family label,
+     *              process is the process type identifier (mold/tuft/blister).
+     *
+     *   2. FILTER: Legacy filters by `display_type = $_GET['process'] ?? 'mold'`.
+     *              Laravel had no display_type filter — returning all rows.
+     *
+     *   3. GUARD:  Legacy excludes empty strings (product != '').
+     *              Laravel only excluded NULL.
+     *
+     * These three gaps cause: wrong column values + wrong row count + extra
+     * empty-string entries in the result set.
+     *
+     * ── FIX ───────────────────────────────────────────────────────────────
+     * BEFORE:
+     *   Device::query()
+     *       ->whereNotNull('process')
+     *       ->orderBy('process')
+     *       ->distinct()
+     *       ->pluck('process')
+     *
+     * AFTER (this implementation):
+     *   Matches legacy SQL exactly — no business logic change.
+     *
+     * @parity-verified Family.index — Phase B value fix (2026-03-05)
      */
     public function index(Request $request): JsonResponse
     {
+        // Legacy: $_GET['process'] ?? 'mold'
+        // Binds to the display_type column — selects devices of that process type.
+        $displayType = (string) $request->input('process', 'mold');
+
         $families = Device::query()
-            ->whereNotNull('process')
-            ->orderBy('process')
+            // Legacy: WHERE display_type = ?
+            ->where('display_type', $displayType)
+            // Legacy: AND product IS NOT NULL
+            ->whereNotNull('product')
+            // Legacy: AND product != ''
+            ->where('product', '!=', '')
+            // Legacy: ORDER BY product ASC
+            ->orderBy('product')
+            // Legacy: SELECT DISTINCT product
             ->distinct()
-            ->pluck('process')
+            ->pluck('product')
             ->values()
             ->all();
 
-        return response()->json([
-            'status' => 'ok',
-            'data'   => $families,
-        ]);
+        // Raw array — matches legacy json_encode($families).
+        return response()->json($families);
     }
+
+
 }

@@ -51,17 +51,35 @@ class DeviceController extends Controller
      *
      * Legacy mirror: default ?action= handler (no action param)
      *
-     * Response: { "status": "ok", "data": [ { device snapshot }, ... ] }
+     * ── PHASE A FIX (2026-03-05) ─────────────────────────────────────────
+     * BEFORE: return response()->json(['status' => 'ok', 'data' => $data]);
+     * AFTER:  return response()->json($data);
+     *
+     * Root cause: legacy api.php returns a raw array via json_encode($results).
+     * The {status, data} wrapper was a Laravel-specific addition that broke
+     * parity with all Vue consumers relying on the flat array shape.
+     *
+     * Status strings are normalized to uppercase contract values
+     * (DISCONNECTED, BREACHED, NORMAL) at the response layer.
+     * No business logic is changed. No DB writes occur.
+     *
+     * @parity-verified Device.live — Phase A (2026-03-05)
      */
     public function live(Request $request): JsonResponse
     {
-        $data = $this->deviceService->getLiveFeed();
+        $raw = $this->deviceService->getLiveFeed();
 
-        return response()->json([
-            'status' => 'ok',
-            'data'   => $data,
-        ]);
+        // Normalize status strings to CONTRACT.md v1.0 uppercase contract.
+        // Applied at response layer only — no mutation of service return value.
+        $data = array_map(
+            static fn(array $row): array => \App\Services\Parity\StatusNormalizer::normalizeDeviceRow($row),
+            (array) $raw,
+        );
+
+        // Return raw array — no wrapper. Matches legacy json_encode($results).
+        return response()->json($data);
     }
+
 
     /*
     |--------------------------------------------------------------------------

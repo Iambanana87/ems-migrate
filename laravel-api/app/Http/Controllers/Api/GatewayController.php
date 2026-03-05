@@ -80,10 +80,23 @@ class GatewayController extends Controller
 
         // ── Device Data & Live Feed ───────────────────────────────────────
         // Legacy: api.php (default action / get_machine_details / search_device / get_families)
+        //
+        // Device.live    → raw array of all device snapshots (no wrapper)
+        //                  CONTRACT.md v1.0: status strings are UPPERCASE
+        //
+        // Device.single  → single device extended stats by device_id
+        //                  RENAMED from Device.details (Phase A) — the old name
+        //                  was semantically wrong; 'details' implied a list.
+        //                  EQUIVALENT legacy action: get_machine_details&device_id=X
+        //
+        // Device.machineDetails → full process-scoped device list with metrics
+        //                         DIFFERENT from Device.single (returns array, not object)
+        //                         Legacy: get_machine_details&process=mold|tuft|blister
         'Device.live'    => [DeviceController::class, 'live'],     // public
-        'Device.details' => [DeviceController::class, 'details'],  // public
+        'Device.single'  => [DeviceController::class, 'details'],  // public — RENAMED from Device.details
         'Device.history' => [DeviceController::class, 'history'],  // public
         'Family.index'   => [FamilyController::class, 'index'],    // public
+
 
         // ── Device Admin CRUD ─────────────────────────────────────────────────
         // Legacy: backend/backend.php (get_devices / add / update / delete)
@@ -92,10 +105,15 @@ class GatewayController extends Controller
         'Device.update'  => [DeviceController::class, 'update'],   // admin
         'Device.destroy' => [DeviceController::class, 'destroy'],  // admin
 
+        'Device.getDevices' => [DeviceController::class, 'getDevices'],
+
         // ── Device Actions (Work Orders) ───────────────────────────────────────
         // Legacy: backend/backend.php (action_create / update / delete / approve / reject)
         'DeviceAction.store'  => [DeviceActionController::class, 'store'],
         'DeviceAction.update' => [DeviceActionController::class, 'update'],
+        'DeviceAction.storeBackend' => [DeviceActionController::class, 'storeBackend'],
+        'DeviceAction.updateBackend' => [DeviceActionController::class, 'updateBackend'],
+        'DeviceAction.listByDevice' => [DeviceActionController::class, 'listByDevice'],
         'DeviceAction.destroy'=> [DeviceActionController::class, 'destroy'],
         'DeviceAction.approve'=> [DeviceActionController::class, 'approve'],
         'DeviceAction.reject' => [DeviceActionController::class, 'reject'],

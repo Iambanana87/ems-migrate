@@ -575,7 +575,7 @@ class ReportService
         $table  = ['mold'=>'mold','tuft'=>'tuft','blister'=>'blister'][$process] ?? 'mold';
 
         $joinOn = $isMold
-            ? "BINARY t.mold_id  = BINARY d.device_id"
+            ? "BINARY t.device_id  = BINARY d.device_id"
             : "BINARY t.device_id = BINARY d.device_id";
 
         $procFilter = $isMold
@@ -701,7 +701,7 @@ class ReportService
 
         $data_table = ['mold'=>'mold','tuft'=>'tuft','blister'=>'blister'][$processType] ?? 'mold';
         $joinOn     = ($processType === 'mold')
-            ? "BINARY t.mold_id = BINARY d.device_id"
+            ? "BINARY t.device_id = BINARY d.device_id"
             : "BINARY t.device_id = BINARY d.device_id";
 
         $procFilterDetails = '';
@@ -849,7 +849,7 @@ class ReportService
         }
 
         $PROC = [
-            'mold'    => ['table' => 'mold',    'join_on' => 'BINARY t.mold_id = BINARY d.device_id',
+            'mold'    => ['table' => 'mold',    'join_on' => 'BINARY t.device_id = BINARY d.device_id',
                           'where_ext' => "AND d.process IN ('Single','1st') AND (t.cycle_time > 20)",
                           'output_col' => 't.cavities'],
             'tuft'    => ['table' => 'tuft',    'join_on' => 'BINARY t.device_id = BINARY d.device_id',
@@ -880,21 +880,7 @@ class ReportService
         }
 
         $parts  = [];
-        $params = [
-            'from' => $fromVN->format('Y-m-d H:i:s'),
-            'to'   => $toVN->format('Y-m-d H:i:s'),
-        ];
-
-        $prodFilterSql = '';
-        if (!empty($requestedProducts)) {
-            $ph = [];
-            foreach ($requestedProducts as $i => $p) { 
-                $k = ":prod{$i}"; 
-                $ph[] = $k; 
-                $params["prod{$i}"] = $p; 
-            }
-            $prodFilterSql = ' AND TRIM(d.product) IN ('.implode(',', $ph).') ';
-        }
+        $params = [];
 
         foreach ($PROC_SQL as $procName => $cfg) {
             $t   = $cfg['table'];
@@ -902,6 +888,20 @@ class ReportService
             $oc  = $cfg['output_col'];
             $wxOn    = $cfg['where_on']    ?? '';
             $wxWhere = $cfg['where_where'] ?? ($cfg['where_ext'] ?? '');
+
+            $params["from_{$procName}"] = $fromVN->format('Y-m-d H:i:s');
+            $params["to_{$procName}"]   = $toVN->format('Y-m-d H:i:s');
+
+            $prodFilterSql = '';
+            if (!empty($requestedProducts)) {
+                $ph = [];
+                foreach ($requestedProducts as $i => $p) { 
+                    $k = ":prod_{$procName}_{$i}"; 
+                    $ph[] = $k; 
+                    $params["prod_{$procName}_{$i}"] = $p; 
+                }
+                $prodFilterSql = ' AND TRIM(d.product) IN ('.implode(',', $ph).') ';
+            }
 
             $parts[] = "
                 SELECT
@@ -918,7 +918,7 @@ class ReportService
                     FROM devices d
                     LEFT JOIN {$t} t
                       ON {$jo}
-                     AND t.`datetime` >= :from AND t.`datetime` < :to
+                     AND t.`datetime` >= :from_{$procName} AND t.`datetime` < :to_{$procName}
                      {$wxOn}
                     WHERE d.display_type = '{$procName}'
                       {$wxWhere}

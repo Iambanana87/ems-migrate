@@ -17,13 +17,12 @@ use Illuminate\Http\JsonResponse;
 class ReportController extends Controller
 {
     private ReportService $reportService;
-
     public function __construct(ReportService $reportService)
     {
         $this->reportService = $reportService;
     }
 
-    public function summary(SummaryReportRequest $request): JsonResponse
+    public function summary(\Illuminate\Http\Request $request): JsonResponse
     {
         $data = $this->reportService->getSummaryReport(
             $request->input('from', ''),
