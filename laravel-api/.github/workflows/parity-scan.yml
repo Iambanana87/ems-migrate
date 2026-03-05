@@ -1,0 +1,121 @@
+name: Parity Scan CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run nightly at 01:00 UTC to catch environment drift
+    - cron: "0 1 * * *"
+
+jobs:
+  parity-scan:
+    name: API Parity Certification
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: production_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:REPLACE_WITH_GENERATED_KEY=
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: production_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+      # Parity scan targets — override for staging environment
+      PARITY_LEGACY_BASE: ${{ vars.PARITY_LEGACY_BASE  || 'http://localhost:8080/ems/api.php' }}
+      PARITY_LARAVEL_BASE: ${{ vars.PARITY_LARAVEL_BASE || 'http://localhost:8000/api/gateway' }}
+      PARITY_AUTH_TOKEN: ${{ secrets.PARITY_AUTH_TOKEN }}
+      PARITY_FLOAT_TOLERANCE: "0.001"
+      PARITY_LOG_CHANNEL: "stderr"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_mysql, curl, json
+          coverage: none
+
+      - name: Install Composer dependencies
+        working-directory: laravel-api
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Copy environment file
+        working-directory: laravel-api
+        run: cp .env.example .env
+
+      - name: Generate application key
+        working-directory: laravel-api
+        run: php artisan key:generate
+
+      - name: Run migrations (test DB seed)
+        working-directory: laravel-api
+        run: php artisan migrate --seed --force
+
+      # -----------------------------------------------------------------------
+      # PHPUnit tests (includes ParityScanTest with Http::fake())
+      # -----------------------------------------------------------------------
+      - name: Run PHPUnit (includes parity unit tests)
+        working-directory: laravel-api
+        run: php artisan test --filter=ParityTest --stop-on-failure
+
+      # -----------------------------------------------------------------------
+      # Live parity scan against real endpoints (staging/prod only)
+      # Skip if legacy base is not configured (fork PRs, default branch pushes)
+      # -----------------------------------------------------------------------
+      - name: Start Laravel dev server (live scan target)
+        working-directory: laravel-api
+        run: php artisan serve --port=8000 &
+        if: ${{ vars.PARITY_LEGACY_BASE != '' }}
+
+      - name: Wait for Laravel server to be ready
+        run: |
+          for i in {1..15}; do
+            curl -sf http://localhost:8000/api/health && break || sleep 2
+          done
+        if: ${{ vars.PARITY_LEGACY_BASE != '' }}
+
+      - name: Run parity:scan — all endpoints (JSON output)
+        working-directory: laravel-api
+        run: |
+          php artisan parity:scan \
+            --json \
+            --save \
+          | tee /tmp/parity-report.json
+        if: ${{ vars.PARITY_LEGACY_BASE != '' }}
+
+      - name: Upload parity scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: parity-scan-report-${{ github.sha }}
+          path: /tmp/parity-report.json
+        if: always()
+
+      - name: Assert zero drift (fail build on any drift)
+        run: |
+          VERDICT=$(jq -r '.verdict' /tmp/parity-report.json)
+          echo "Parity verdict: $VERDICT"
+          if [ "$VERDICT" != "FULL_API_PARITY_CERTIFIED" ]; then
+            echo "DRIFT DETECTED — see parity-report artifact for details"
+            exit 1
+          fi
+        if: ${{ vars.PARITY_LEGACY_BASE != '' }}
