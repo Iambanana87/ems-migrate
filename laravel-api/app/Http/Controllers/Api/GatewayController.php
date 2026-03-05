@@ -143,6 +143,7 @@ class GatewayController extends Controller
         'Report.actionsBoard' => [ReportController::class, 'actionsBoard'],
         'Report.devicesActionTable' => [ReportController::class, 'devicesActionTable'],
         'Report.previewNextCodes' => [ReportController::class, 'previewNextCodes'],
+        'DeviceAction.previewNextCodes' => [DeviceActionController::class, 'previewNextCodes'],
         'Report.listBackendIssues' => [ReportController::class, 'listBackendIssues'],
         'Report.countActions' => [ReportController::class, 'countActions'],
         'Report.countDeviceStatus' => [ReportController::class, 'countDeviceStatus'],
@@ -201,6 +202,8 @@ class GatewayController extends Controller
             $response = app()->call([$controller, $method]);
 
             return $response;
+        } catch (\Illuminate\Http\Exceptions\HttpResponseException $e) {
+            return $e->getResponse();
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => 'error',

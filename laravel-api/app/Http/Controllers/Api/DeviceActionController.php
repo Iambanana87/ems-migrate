@@ -353,6 +353,111 @@ class DeviceActionController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | m=storeBackend — Create action (admin version)
+    |--------------------------------------------------------------------------
+    | Mirror legacy backend/backend.php 'action_create'
+    */
+    public function storeBackend(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $claims = $this->requireRole($request, ['admin']);
+        $who    = $this->whoFromClaims($claims);
+
+        try {
+            DB::beginTransaction();
+
+            $device_id = trim((string)($request->input('device_id', '')));
+            $title     = trim((string)($request->input('title', '')));
+            if (!$device_id || !$title) {
+                throw new \Exception('Missing device_id/title');
+            }
+
+            $priority = $request->input('priority', 'medium');
+            
+            $due_in   = trim((string)($request->input('due_date', '')));
+            $due_date = $due_in !== '' ? $due_in : null;
+
+            $assigneeRaw = (string)($request->input('assigned_to_user_id') ?? '');
+            $assignee = ($assigneeRaw !== '') ? (int)$assigneeRaw : null;
+
+            $sf_json = $request->input('short_form', '[]');
+            $sf = json_decode((string)$sf_json, true);
+            if (!is_array($sf)) {
+                throw new \Exception('short_form must be JSON array');
+            }
+
+            $id = DB::table('device_actions')->insertGetId([
+                'device_id'           => $device_id,
+                'title'               => $title,
+                'short_form'          => json_encode($sf, \JSON_UNESCAPED_UNICODE),
+                'status'              => 'open',
+                'priority'            => $priority,
+                'due_date'            => $due_date,
+                'assigned_to_user_id' => $assignee,
+                'created_by_name'     => $who,
+                'created_at'          => now(),
+                'updated_at'          => now(),
+            ]);
+
+            $afterRow = [
+                'id'                  => $id,
+                'device_id'           => $device_id,
+                'title'               => $title,
+                'short_form'          => json_encode($sf, \JSON_UNESCAPED_UNICODE),
+                'status'              => 'open',
+                'priority'            => $priority,
+                'due_date'            => $due_date,
+                'assigned_to_user_id' => $assignee,
+                'created_by_name'     => $who,
+                '__entity'            => 'device_actions:create#' . $id,
+            ];
+
+            $reason = trim((string)($request->input('reason', $request->input('note', ''))));
+            app(\App\Services\AuditService::class)->log('create', $reason ?: 'action_create', [], $afterRow, $who);
+
+            DB::commit();
+
+            return response()->json(['status' => 'success', 'message' => 'Action created', 'id' => $id]);
+        } catch (\Exception $e) {
+            if (DB::transactionLevel() > 0) DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 200, [], \JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | m=updateBackend — Update action (admin version)
+    |--------------------------------------------------------------------------
+    | Mirror legacy backend/backend.php 'action_update'
+    */
+    public function updateBackend(\Illuminate\Http\Request $request): JsonResponse
+    {
+        // Actually update() already implements the full admin logic mirror.
+        return $this->update($request);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | m=listByDevice — List actions for a specific device
+    |--------------------------------------------------------------------------
+    | Legacy mirror: backend.php actions_by_device or similar
+    */
+    public function listByDevice(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $device_id = $request->input('device_id');
+        if (!$device_id) {
+            return response()->json(['status' => 'error', 'message' => 'device_id required'], 400);
+        }
+
+        $rows = DB::select("SELECT * FROM device_actions WHERE device_id = ? ORDER BY id DESC", [$device_id]);
+        return response()->json([
+            'status'  => 'success',
+            'device_id' => $device_id,
+            'items'   => $rows
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | m=preview_next_codes
     |--------------------------------------------------------------------------
     | Legacy: returns AUTO_INCREMENT for device_actions and device_action_plans

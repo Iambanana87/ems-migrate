@@ -19,3 +19,69 @@
 [05-Mar-2026 14:13:27 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
 [05-Mar-2026 14:13:41 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
 [05-Mar-2026 14:13:41 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 14:57:28 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 14:57:29 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 14:57:32 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 14:57:33 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 14:57:42 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 14:57:43 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:12:54 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:12:55 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:12:59 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:12:59 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:13:09 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:13:09 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:22:34 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:22:35 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:22:39 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:22:39 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:22:49 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:22:49 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:23:15 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:23:15 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:23:19 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:23:19 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:23:29 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:23:30 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:40:42 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:40:42 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:40:46 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:40:46 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:40:55 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:40:56 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:53:39 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:53:40 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 15:53:44 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:53:44 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 15:53:54 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 15:53:54 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:00:13 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:00:14 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:00:17 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:00:18 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:00:28 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:00:29 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:00:59 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:01:00 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:01:03 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:01:04 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:01:14 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:01:15 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:20:21 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:20:21 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:20:25 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:20:26 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:20:37 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:20:37 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:22:25 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:22:26 Asia/Ho_Chi_Minh] API FATAL ERROR: Device ID and date range are required for device search. in C:\xampp\htdocs\ems\api.php on line 767
+[05-Mar-2026 16:22:30 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:22:30 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:22:40 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:22:40 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:33:33 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[05-Mar-2026 16:33:33 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[05-Mar-2026 16:33:38 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:33:38 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[05-Mar-2026 16:33:48 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[05-Mar-2026 16:33:48 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes

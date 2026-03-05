@@ -44,15 +44,14 @@ final class DeviceActionService
     public function create(array $data, string $who): DeviceAction
     {
         return DB::transaction(function () use ($data, $who): DeviceAction {
-            $nextPriority = (DeviceAction::where('device_id', $data['device_id'])->max('priority') ?? 0) + 1;
-
             $action = DeviceAction::create([
-                'device_id'  => $data['device_id'],
-                'action'     => $data['action'],
-                'details'    => $data['details'] ?? null,
-                'status'     => DeviceAction::STATUS_PENDING,
-                'priority'   => $nextPriority,
-                'created_by' => $who,
+                'device_id'       => $data['device_id'],
+                'title'           => $data['title'],
+                'short_form'      => $data['short_form'] ?? '[]',
+                'status'          => DeviceAction::STATUS_OPEN,
+                'approval_status' => DeviceAction::APPROVAL_PENDING,
+                'priority'        => 'medium',
+                'created_by_name' => $who,
             ]);
 
             // Audit: before = empty (new record)
@@ -93,9 +92,10 @@ final class DeviceActionService
         return DB::transaction(function () use ($action, $data, $who): DeviceAction {
             $before = $action->toArray();
             $action->update(array_filter([
-                'action'   => $data['action'] ?? null,
-                'details'  => $data['details'] ?? null,
-                'priority' => isset($data['priority']) ? (int) $data['priority'] : null,
+                'title'      => $data['title'] ?? null,
+                'short_form' => $data['short_form'] ?? null,
+                'priority'   => $data['priority'] ?? null,
+                'status'     => $data['status'] ?? null,
             ], fn ($v) => $v !== null));
             $after = $action->fresh()->toArray();
 
@@ -169,9 +169,9 @@ final class DeviceActionService
         DB::transaction(function () use ($action, $who): void {
             $before = $action->toArray();
             $action->update([
-                'status'      => DeviceAction::STATUS_APPROVED,
-                'approved_by' => $who,
-                'approved_at' => now(),
+                'approval_status'  => DeviceAction::APPROVAL_APPROVED,
+                'approved_by_name' => $who,
+                'approved_at'      => now(),
             ]);
             $this->audit->log('action_approve', null, $before, $action->fresh()->toArray(), $who);
         });
@@ -207,8 +207,8 @@ final class DeviceActionService
         DB::transaction(function () use ($action, $who, $reason): void {
             $before = $action->toArray();
             $action->update([
-                'status' => DeviceAction::STATUS_REJECTED,
-                'notes'  => $reason,
+                'approval_status' => DeviceAction::APPROVAL_REJECTED,
+                'approval_note'   => $reason,
             ]);
             $this->audit->log('action_reject', $reason, $before, $action->fresh()->toArray(), $who);
         });
@@ -743,6 +743,35 @@ final class DeviceActionService
             'next_plan_id'     => $nextPlanId,
             'next_plan_code'   => sprintf('AP%05d', $nextPlanId),
         ];
+    }
+    public function listActionPlans(array $data): array
+    {
+        $aid = (int)($data['action_id'] ?? 0);
+        if ($aid <= 0) {
+            return [];
+        }
+
+        $sql = "
+            SELECT
+                p.id,
+                COALESCE(p.plan_code, CONCAT('AP', LPAD(p.id, 5, '0'))) AS plan_code,
+                p.plan_text,
+                p.status,
+                p.est_date,
+                p.est_date AS planned_completion_date,
+                p.owner_user_id,
+                COALESCE(p.owner_name, u.username) AS owner_name
+            FROM device_action_plans p
+            LEFT JOIN users u ON u.id = p.owner_user_id
+            WHERE p.action_id = ?
+            ORDER BY
+                p.est_date IS NULL,
+                p.est_date ASC,
+                p.id ASC
+        ";
+
+        $rows = DB::select($sql, [$aid]);
+        return array_map(fn($r) => (array)$r, $rows);
     }
 }
 

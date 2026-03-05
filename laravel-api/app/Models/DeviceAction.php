@@ -20,14 +20,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int             $id
  * @property string          $device_id
- * @property string          $action        Human-readable label
+ * @property string          $title         Human-readable label
  * @property string|null     $details       Full description
  * @property string          $status        pending|approved|rejected|completed
  * @property int             $priority      Display order (lower = higher priority)
- * @property string|null     $created_by    JWT username of creator
- * @property string|null     $approved_by   JWT username of approver
+ * @property string|null     $created_by_name JWT username of creator
+ * @property string|null     $approved_by_name JWT username of approver
  * @property \Carbon\Carbon|null $approved_at
- * @property string|null     $notes         Rejection reason
+ * @property string|null     $approval_note  Rejection reason/notes
  * @property \Carbon\Carbon  $created_at
  * @property \Carbon\Carbon  $updated_at
  */
@@ -44,22 +44,27 @@ class DeviceAction extends Model
     | Used by DeviceActionService for all status transitions.
     | Keeps magic strings out of service/controller code.
     */
-    public const STATUS_PENDING   = 'pending';
-    public const STATUS_APPROVED  = 'approved';
-    public const STATUS_REJECTED  = 'rejected';
-    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_OPEN        = 'open';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_DONE        = 'done';
+    public const STATUS_CANCELLED   = 'cancelled';
+
+    public const APPROVAL_PENDING  = 'pending';
+    public const APPROVAL_APPROVED = 'approved';
+    public const APPROVAL_REJECTED = 'rejected';
 
     /** @var list<string> */
     protected $fillable = [
         'device_id',
-        'action',
-        'details',
+        'title',
+        'short_form',
         'status',
         'priority',
-        'created_by',
-        'approved_by',
+        'created_by_name',
+        'created_by_user_id',
+        'approved_by_name',
         'approved_at',
-        'notes',
+        'approval_note',
     ];
 
     /** @return array<string, string> */
@@ -123,12 +128,12 @@ class DeviceAction extends Model
 
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->approval_status === self::APPROVAL_PENDING;
     }
 
     public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->approval_status === self::APPROVAL_APPROVED;
     }
 
     /**
@@ -136,7 +141,7 @@ class DeviceAction extends Model
      */
     public function isOwnedBy(string $who): bool
     {
-        return $this->created_by === $who;
+        return $this->created_by_name === $who;
     }
 
     /**
@@ -144,6 +149,6 @@ class DeviceAction extends Model
      */
     public function isCreatedBy(string $who): bool
     {
-        return $this->created_by === $who;
+        return $this->created_by_name === $who;
     }
 }

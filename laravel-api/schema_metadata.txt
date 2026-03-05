@@ -1,0 +1,17 @@
+id | bigint(20) unsigned | NO | 
+action_code | varchar(16) | YES | 
+device_id | varchar(50) | NO | 
+title | varchar(120) | NO | 
+issue_type | varchar(50) | YES | 
+short_form | longtext | YES | 
+status | enum('open','in_progress','done','cancelled') | NO | open
+approval_status | enum('pending','approved','rejected') | NO | pending
+approved_by_user_id | int(11) | YES | 
+approved_by_name | varchar(100) | YES | 
+approved_at | datetime | YES | 
+approval_note | varchar(255) | YES | 
+priority | enum('low','medium','high','urgent') | NO | medium
+created_by_user_id | int(11) | YES | 
+created_by_name | varchar(100) | YES | 
+created_at | datetime | NO | current_timestamp()
+updated_at | datetime | NO | current_timestamp()

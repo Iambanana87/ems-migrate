@@ -1717,7 +1717,7 @@ SQL;
                 $unit = $d['unit'] ?: ($type === 'mold' ? 'shot' : 'pcs');
 
                 if ($type === 'mold') {
-                    $res = DB::select("SELECT COUNT(*) AS c FROM mold WHERE mold_id = ? AND datetime > ? AND cycle_time >= 20", [$eid, $lastUpdate]);
+                    $res = DB::select("SELECT COUNT(*) AS c FROM mold WHERE device_id = ? AND datetime > ? AND cycle_time >= 20", [$eid, $lastUpdate]);
                     $addedValue = (int)($res[0]->c ?? 0);
                     if (!$d['unit']) $unit = 'shot';
                 } 

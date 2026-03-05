@@ -20,9 +20,9 @@ class CreateDeviceActionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'device_id' => ['required', 'string', 'max:50', 'exists:devices,device_id'],
-            'action'    => ['required', 'string', 'max:100'],
-            'details'   => ['nullable', 'string'],
+            'device_id'  => ['required', 'string', 'max:50', 'exists:devices,device_id'],
+            'title'      => ['required', 'string', 'max:100'],
+            'short_form' => ['nullable', 'string'],
         ];
     }
 
@@ -31,7 +31,7 @@ class CreateDeviceActionRequest extends FormRequest
     {
         return [
             'device_id.exists' => 'Device not found.',
-            'action.required'  => 'Action label is required.',
+            'title.required'   => 'Action label is required.',
         ];
     }
 

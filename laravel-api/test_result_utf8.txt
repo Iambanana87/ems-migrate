@@ -1,0 +1,22 @@
+﻿Testing machine_details.mold... OK
+Testing machine_details.tuft... OK
+Testing machine_details.blister... OK
+Testing tc_meta... OK
+Testing count_actions... OK
+Testing count_device_status... OK
+Testing count_flexible... OK
+Testing get_families... OK
+Testing search_device... OK
+Testing get_summary_report... OK
+Testing get_output_report... OK
+Testing get_output_report_bulk... OK
+Testing get_efficiency_report_data... OK
+Testing get_hourly_report... OK
+Testing actions_board... OK
+Testing devices_action_table... OK
+Testing list_users... OK
+Testing list_device_actions_v2... OK
+Testing create_device_action... FAIL [HTTP 500]
+URL: http://localhost:8000/api/gateway?c=DeviceAction&m=store&device_id=MOLD-01&title=Test+Parity+Action
+
+{"status":"error","message":"Gateway Crash: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'details' in 'field list' (Connection: production, SQL: insert into `device_actions` (`device_id`, `title`, `details`, `status`, `priority`, `created_by`, `updated_at`, `created_at`) values (MOLD-01, Test Parity Action, ?, pending, 1, admin, 2026-03-05 14:54:32, 2026-03-05 14:54:32))","file":"C:\\xampp\\htdocs\\ems\\laravel-api\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php","line":825}

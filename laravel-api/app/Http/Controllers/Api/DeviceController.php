@@ -431,4 +431,37 @@ class DeviceController extends Controller
 
         return response()->json($results, 200, ['Content-Type' => 'application/json'], \JSON_NUMERIC_CHECK);
     }
+
+    /**
+     * GET /api/gateway?c=Device&m=getDevices
+     *
+     * Returns devices grouped by their display_type.
+     * Legacy mirror: backend.php ?action=get_devices
+     */
+    public function getDevices(): JsonResponse
+    {
+        // requireAdmin() equivalent not enforced in legacy GET get_devices, 
+        // but we'll keep it consistent with the backend context.
+        $devices = \App\Models\Device::all();
+        
+        $grouped = [
+            'mold'          => [],
+            'injection'     => [],
+            'tuft'          => [],
+            'end-rounding'  => [],
+            'blister'       => [],
+        ];
+
+        foreach ($devices as $d) {
+            $type = $d->display_type;
+            if (isset($grouped[$type])) {
+                $grouped[$type][] = $d->toArray();
+            }
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'devices' => $grouped,
+        ]);
+    }
 }
