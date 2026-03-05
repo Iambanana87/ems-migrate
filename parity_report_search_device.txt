@@ -1,0 +1,86 @@
+CASE: Valid_StandardRange
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Valid_1HourRange
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Valid_EmptyResult
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Valid_Limit2000_Boundary
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_DeviceZero
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_SameTimestamps
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_FromGreaterTo
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_InvalidDateFormat
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_InvalidDevice
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Edge_DisplayType_Tuft
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Error_MissingDevice
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Error_MissingFrom
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Error_MissingTo
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+CASE: Error_EmptyParams
+STATUS MATCH: yes
+STRUCTURE MATCH: yes
+VALUE MATCH: yes
+NOTES: Identical
+--------------------------------------------------
+
+PARITY CONFIRMED — ZERO STRUCTURAL DRIFT

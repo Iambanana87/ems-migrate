@@ -245,9 +245,11 @@ class ReportController extends Controller
             return response()->json($data, 200, [
                 'Content-Type' => 'application/json; charset=utf-8'
             ], \JSON_UNESCAPED_UNICODE);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage()
+                'error'   => 'Throwable capture: ' . $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine()
             ], 500, [], \JSON_UNESCAPED_UNICODE);
         }
     }

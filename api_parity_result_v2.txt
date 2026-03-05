@@ -1,0 +1,53 @@
+﻿php : PHP Warning:  
+Undefined array key 0 
+in C:\xampp\htdocs\ems\
+certify_api_parity.php 
+on line 60
+At line:1 char:1
++ php 
+certify_api_parity.php 
+2>&1 | Out-File 
+-FilePath 
+c:\xampp\htdocs\ ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (PHP Warning:    
+  U....php on line     
+60:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+
+Warning: Undefined array key 0 in C:\xampp\htdocs\ems\certify_api_parity.php on line 60
+PHP Fatal error:  
+Uncaught TypeError: 
+array_keys(): Argument 
+#1 ($array) must be of 
+type array, null given 
+in C:\xampp\htdocs\ems\
+certify_api_parity.php:
+73
+Stack trace:
+#0 C:\xampp\htdocs\ems\
+certify_api_parity.php(
+73): array_keys(NULL)
+#1 C:\xampp\htdocs\ems\
+certify_api_parity.php(
+145): compareResponses(
+Array, Array, 
+'Snapshot: mold')
+#2 {main}
+  thrown in C:\xampp\ht
+docs\ems\certify_api_pa
+rity.php on line 73
+
+Fatal error: Uncaught TypeError: array_keys(): Argument #1 ($array) must be of type array, null given in C:\xampp\htdocs\ems\certify_api_parity.php:73
+Stack trace:
+#0 C:\xampp\htdocs\ems\certify_api_parity.php(73): array_keys(NULL)
+#1 C:\xampp\htdocs\ems\certify_api_parity.php(145): compareResponses(Array, Array, 'Snapshot: mold')
+#2 {main}
+  thrown in C:\xampp\htdocs\ems\certify_api_parity.php on line 73

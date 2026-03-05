@@ -1,0 +1,21 @@
+Array
+(
+    [legacy] => Array
+        (
+            [code] => 200
+            [body] => {"db_updated_at":null,"server_now":"2026-03-04 15:08:02","tz":"Asia\/Ho_Chi_Minh"}
+            [err] => 
+            [content_type] => application/json; charset=utf-8
+            [time] => 50.923824310303
+        )
+
+    [lar] => Array
+        (
+            [code] => 500
+            [body] => 
+            [err] => 
+            [content_type] => text/html; charset=UTF-8
+            [time] => 298.32005500793
+        )
+
+)

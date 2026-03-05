@@ -13,12 +13,10 @@ use App\Http\Requests\DeviceAction\ListActionPlansRequest;
 use App\Http\Requests\DeviceAction\ListDeviceActionsV2Request;
 use App\Http\Requests\DeviceAction\RejectActionRequest;
 use App\Http\Requests\DeviceAction\UpdateActionPlanStatusRequest;
-use App\Http\Requests\DeviceAction\UpdateDeviceActionRequest;
 use App\Services\DeviceActionService;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 /**
  * DeviceActionController
@@ -59,30 +57,98 @@ class DeviceActionController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | m=update — Edit action (creator or admin)
+    | m=update — Edit action (admin only)
     |--------------------------------------------------------------------------
+    | STRICT PARITY with backend/backend.php case 'action_update' (lines 170-229).
+    | - Admin only (requireAdmin equivalent)
+    | - Raw DB queries, no Eloquent
+    | - Explicit transaction
+    | - Always HTTP 200 (even on error)
+    | - require_reason() equivalent
     */
 
-    public function update(UpdateDeviceActionRequest $request): JsonResponse
+    public function update(\Illuminate\Http\Request $request): JsonResponse
     {
-        $claims  = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
-        $who     = $this->whoFromClaims($claims);
-        $isAdmin = strtolower($claims['role'] ?? '') === 'admin';
+        // requireAdmin() equivalent
+        $claims = $this->requireRole($request, ['admin']);
+        $who    = $this->whoFromClaims($claims);
 
         try {
-            $action = $this->actionService->update(
-                id:      $request->getId(),
-                data:    $request->validated(),
-                who:     $who,
-                isAdmin: $isAdmin,
-            );
-        } catch (ModelNotFoundException) {
-            return response()->json(['status' => 'error', 'message' => 'Action not found.'], 404);
-        } catch (AuthorizationException $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 403);
-        }
+            DB::beginTransaction();
 
-        return response()->json(['status' => 'ok', 'message' => 'Action updated.', 'data' => $action->toArray()]);
+            $id = (int)($request->input('action_id', 0));
+            if ($id <= 0) {
+                throw new \Exception('Missing action_id');
+            }
+
+            // SELECT beforeRow
+            $rows = DB::select('SELECT * FROM device_actions WHERE id = ?', [$id]);
+            if (empty($rows)) {
+                throw new \Exception('Action not found');
+            }
+            $beforeRow = (array) $rows[0];
+
+            // title fallback: POST -> beforeRow -> ''
+            $title    = trim((string)($request->input('title', $beforeRow['title'] ?? '')));
+            // priority fallback: POST -> beforeRow -> 'medium'
+            $priority = $request->input('priority', $beforeRow['priority'] ?? 'medium');
+
+            // due_date: empty string -> null
+            $due_in   = trim((string)($request->input('due_date', '')));
+            $due_date = $due_in !== '' ? $due_in : null;
+
+            // assigned_to_user_id: empty string -> keep previous value
+            $assigneeRaw = (string)($request->input('assigned_to_user_id') ?? '');
+            $assignee = ($assigneeRaw !== '')
+                ? (int)$assigneeRaw
+                : ($beforeRow['assigned_to_user_id'] ?? null);
+
+            // short_form: JSON decode and strict array validation
+            $sf_json = $request->input('short_form', $beforeRow['short_form'] ?? '[]');
+            $sf      = json_decode((string)$sf_json, true);
+            if (!is_array($sf)) {
+                throw new \Exception('short_form must be JSON array');
+            }
+
+            // status normalization with whitelist and silent fallback
+            $status_in = strtolower(trim((string)($request->input('status', $beforeRow['status'] ?? 'open'))));
+            $allowed   = ['open', 'in_progress', 'done', 'cancelled'];
+            $status    = in_array($status_in, $allowed, true) ? $status_in : ($beforeRow['status'] ?? 'open');
+
+            // UPDATE
+            DB::update(
+                'UPDATE device_actions SET title=?, priority=?, status=?, due_date=?, assigned_to_user_id=?, short_form=? WHERE id=?',
+                [$title, $priority, $status, $due_date, $assignee, json_encode($sf, \JSON_UNESCAPED_UNICODE), $id]
+            );
+
+            // Audit: require_reason() equivalent
+            $reason = trim((string)($request->input('reason', $request->input('note', ''))));
+            if ($reason === '') {
+                throw new \Exception('reason required');
+            }
+
+            $afterRow = $beforeRow;
+            $afterRow['title']               = $title;
+            $afterRow['priority']            = $priority;
+            $afterRow['status']              = $status;
+            $afterRow['due_date']            = $due_date;
+            $afterRow['assigned_to_user_id'] = $assignee;
+            $afterRow['short_form']          = json_encode($sf, \JSON_UNESCAPED_UNICODE);
+
+            $beforeRow['__entity'] = 'device_actions:update#' . $id;
+            $afterRow['__entity']  = 'device_actions:update#' . $id;
+
+            app(\App\Services\AuditService::class)->log('update', $reason, $beforeRow, $afterRow, $who);
+
+            DB::commit();
+
+            return response()->json(['status' => 'success', 'message' => 'Action updated'], 200, [], \JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 200, [], \JSON_UNESCAPED_UNICODE);
+        }
     }
 
     /*

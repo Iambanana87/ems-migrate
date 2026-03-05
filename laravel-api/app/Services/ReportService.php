@@ -1502,7 +1502,7 @@ SQL;
         return $counts;
     }
 
-    private function calculateMoldMetrics(array $live, array $device) {
+    public function calculateMoldMetrics(array $live, array $device) {
         // Đầu vào cần: target (sec/shot), mold_cavity, current_cycle (sec/shot), actual_cavity
         $targetSec     = (float)($device['target'] ?? $device['target_limit'] ?? 0); // giây/shot
         $moldCavity    = (int)  ($device['mold_cavity'] ?? $device['cavities'] ?? 0);
@@ -1530,7 +1530,7 @@ SQL;
         ];
     }
 
-    private function calculateTuftMetrics(array $live, array $device) {
+    public function calculateTuftMetrics(array $live, array $device) {
         // target_per_min: cấu hình pcs/phút (devices.target_limit)
         $targetPerMin = (float)($device['target'] ?? $device['target_limit'] ?? 0); // ví dụ 20
         // actual_per_min: live output pcs/phút
@@ -1557,7 +1557,7 @@ SQL;
         ];
     }
 
-    private function calculateBlisterMetrics(array $live, array $device) {
+    public function calculateBlisterMetrics(array $live, array $device) {
         // 1) Tham số từ cấu hình
         $targetCyclesPerMin = (float)($device['target'] ?? $device['target_limit'] ?? 0); // cycles/phút
         $brushesPerCycle = (int)($device['brushes_per_cycle']
@@ -1600,6 +1600,8 @@ SQL;
             'loss_pcs'       => round($lossPcs, 2),
             'idle_breakdown' => round($idleMins, 2),
         ];
+    }
+
     public function countFlexible(array $data): int
     {
         $proc = strtolower(trim($data['process'] ?? ''));

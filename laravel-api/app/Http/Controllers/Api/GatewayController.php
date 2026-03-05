@@ -133,6 +133,10 @@ class GatewayController extends Controller
         'Report.getTcMeta' => [ReportController::class, 'getTcMeta'],
         'User.listUsers' => [UserController::class, 'listUsers'],
 
+        // ── Device Machine Details (all devices by process type) ─────────────
+        // Legacy: api.php ?action=get_machine_details
+        'Device.machineDetails' => [DeviceController::class, 'getMachineDetails'],
+
         // ── [FUTURE BATCHES — ADD BELOW AS FILES ARE MIGRATED] ───────────────
         // Example:
         // 'Device.getLiveData'    => [DeviceController::class,  'live'],
@@ -155,38 +159,38 @@ class GatewayController extends Controller
      */
     public function dispatch(Request $request): JsonResponse
     {
-        // Extract c and m — prefer query string but fall back to body for POST
-        $c = trim((string) ($request->query('c') ?? $request->input('c', '')));
-        $m = trim((string) ($request->query('m') ?? $request->input('m', '')));
+        try {
+            // Extract c and m — prefer query string but fall back to body for POST
+            $c = trim((string) ($request->query('c') ?? $request->input('c', '')));
+            $m = trim((string) ($request->query('m') ?? $request->input('m', '')));
 
-        if ($c === '' || $m === '') {
-            return $this->notFound($c, $m);
+            if ($c === '' || $m === '') {
+                return $this->notFound($c, $m);
+            }
+
+            $key = "{$c}.{$m}";
+
+            if (! isset(self::DISPATCH_MAP[$key])) {
+                return $this->notFound($c, $m);
+            }
+
+            [$controllerClass, $method] = self::DISPATCH_MAP[$key];
+
+            /** @var Controller $controller */
+            $controller = app($controllerClass);
+
+            /** @var JsonResponse $response */
+            $response = app()->call([$controller, $method]);
+
+            return $response;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gateway Crash: ' . $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
-
-        $key = "{$c}.{$m}";
-
-        if (! isset(self::DISPATCH_MAP[$key])) {
-            return $this->notFound($c, $m);
-        }
-
-        [$controllerClass, $method] = self::DISPATCH_MAP[$key];
-
-        /** @var Controller $controller */
-        $controller = app($controllerClass);
-
-        /*
-         * `app()->call()` is the critical piece:
-         * - Resolves method type-hints from the IoC container.
-         * - When a FormRequest is type-hinted (e.g. LoginRequest):
-         *     → creates it from the current HTTP request
-         *     → runs authorize() and validate()
-         *     → throws HttpResponseException on failure (→ 400 JSON)
-         * - Passes the result directly as our JsonResponse.
-         */
-        /** @var JsonResponse $response */
-        $response = app()->call([$controller, $method]);
-
-        return $response;
     }
 
     /*

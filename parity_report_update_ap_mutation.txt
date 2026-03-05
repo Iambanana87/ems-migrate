@@ -1,0 +1,32 @@
+CASE: valid_update
+MATCH: YES
+NOTES:
+  Identical
+----------------------------------------
+CASE: invalid_plan_id
+MATCH: YES
+NOTES:
+  Identical
+----------------------------------------
+CASE: missing_plan_id
+MATCH: YES
+NOTES:
+  Identical
+----------------------------------------
+CASE: invalid_status
+MATCH: YES
+NOTES:
+  Identical
+----------------------------------------
+CASE: parent_cascade_trigger
+MATCH: YES
+NOTES:
+  Identical
+----------------------------------------
+CASE: concurrency_simulation
+MATCH: YES
+NOTES:
+  Identical state after race
+----------------------------------------
+
+PARITY CONFIRMED — ZERO STRUCTURAL DRIFT
