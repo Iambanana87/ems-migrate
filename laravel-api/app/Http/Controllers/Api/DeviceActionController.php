@@ -47,12 +47,17 @@ class DeviceActionController extends Controller
 
     public function store(CreateDeviceActionRequest $request): JsonResponse
     {
-        $claims = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
-        $who    = $this->whoFromClaims($claims);
+        try {
+            $claims = $this->requireRole($request, array_values((array) config('ems.role_hierarchy')));
+            $who    = $this->whoFromClaims($claims);
 
-        $action = $this->actionService->create($request->validated(), $who);
+            $action = $this->actionService->create($request->validated(), $who);
 
-        return response()->json(['status' => 'ok', 'message' => 'Action created.', 'data' => $action->toArray()]);
+            // Legacy api.php ?action=create_device_action returns {"ok":true,"id":N}
+            return response()->json(['ok' => true, 'id' => $action->id]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 200);
+        }
     }
 
     /*
@@ -142,6 +147,17 @@ class DeviceActionController extends Controller
 
             DB::commit();
 
+            // Parity Alignment: Legacy api.php ?action=update_device_action_status is broken 
+            // and falls through to return the full device list dashboard view.
+            if ($request->input('action') === 'update_device_action_status') {
+                $raw = app(DeviceService::class)->getLiveFeed();
+                $devices = array_map(
+                    static fn(array $row): array => \App\Services\Parity\StatusNormalizer::normalizeDeviceRow($row),
+                    (array) $raw,
+                );
+                return response()->json(['devices' => $devices, 'newTimestamp' => gmdate('Y-m-d H:i:s')]);
+            }
+
             return response()->json(['status' => 'success', 'message' => 'Action updated'], 200, [], \JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             if (DB::transactionLevel() > 0) {
@@ -171,7 +187,7 @@ class DeviceActionController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 403);
         }
 
-        return response()->json(['status' => 'ok', 'message' => 'Action deleted.']);
+        return response()->json(['status' => 'success', 'message' => 'Action deleted']);
     }
 
     /*
@@ -193,7 +209,7 @@ class DeviceActionController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 403);
         }
 
-        return response()->json(['status' => 'ok', 'message' => 'Approved.']);
+        return response()->json(['status' => 'success']);
     }
 
     /*
@@ -215,7 +231,7 @@ class DeviceActionController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 403);
         }
 
-        return response()->json(['status' => 'ok', 'message' => 'Rejected.']);
+        return response()->json(['status' => 'success']);
     }
 
     /*

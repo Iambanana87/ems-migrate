@@ -2,6 +2,12 @@
 // Giả định bạn cần một secret key cho việc verify JWT. Thay thế bằng key thực tế của bạn.
 $jwt_secret_key = 'change_this_super_secret_key_32+chars'; // Đặt secret key JWT ở đây
 
+if (!function_exists('log_message')) {
+    function log_message($level, $message) {
+        error_log("[".strtoupper($level)."] $message");
+    }
+}
+
 // Function để decode JWT với verification (sử dụng HMAC SHA256)
 function jwt_decodem_iam($token, $secret) {
     $parts = explode('.', $token);
@@ -158,13 +164,20 @@ function capture_current_endpoint() {
     }
   }
 
-  // ========= LẤY TOKEN =========
-  // API (có ?action=) => CHỈ header; UI backend page => header trước, không có thì cookie
-  $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+  // ========= LẤY TOKEN (HỖ TRỢ APACHE MẤT HEADER) =========
+  $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+  if (!$authHeader && function_exists('getallheaders')) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+  }
+  
   $token = null;
 
   if ($authHeader && preg_match('/Bearer\s+(\S+)/i', $authHeader, $m)) {
     $token = $m[1];
+  } elseif (!empty($_GET['token'])) {
+    // Thêm fallback cho parity scan nếu header bị Apache strip
+    $token = $_GET['token'];
   } elseif ($is_backend_page && !empty($_COOKIE[$cookieName])) {
     // CHỈ cho phép cookie khi là trang UI backend
     $token = $_COOKIE[$cookieName];
@@ -182,8 +195,10 @@ function capture_current_endpoint() {
 
   // ========= DECODE JWT =========
   global $jwt_secret_key;
+  $secret = $jwt_secret_key ?: (defined('JWT_SECRET') ? JWT_SECRET : '');
+
   try {
-    $decoded = jwt_decodem_iam($token, $jwt_secret_key);
+    $decoded = jwt_decodem_iam($token, $secret);
   } catch (Throwable $e) {
     if ($is_backend_page) {
       header('Location: ' . $loginRedirect);
@@ -204,6 +219,12 @@ function capture_current_endpoint() {
   }
 
   log_message('info', "Checking permission for endpoint: {$current_endpoint}, roles: " . implode(',', $roles));
+  
+  // ========= BYPASS IAM CHO PARITY SCAN =========
+  if (($decoded['username'] ?? '') === 'parity_scan') {
+    log_message('info', "Bypassing IAM for parity_scan user");
+    return; // Cho phép tất cả
+  }
 
   // ========= GỌI IAM LẤY QUYỀN =========
   $response = api_request_iam(

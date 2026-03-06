@@ -85,3 +85,85 @@
 [05-Mar-2026 16:33:38 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
 [05-Mar-2026 16:33:48 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
 [05-Mar-2026 16:33:48 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=preview_next_codes
+[06-Mar-2026 10:05:19 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:05:19 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:07:59 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:07:59 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:08:01 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:08:01 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:08:08 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:08:09 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:15:13 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:15:14 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:15:16 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:15:16 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:15:25 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:15:25 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:17:13 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:17:13 Asia/Ho_Chi_Minh] API FATAL ERROR: Invalid date format. Expected 'Y-m-d H:i:s'. in C:\xampp\htdocs\ems\api.php on line 782
+[06-Mar-2026 10:17:15 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:17:15 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:17:21 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:17:22 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:31:26 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:31:26 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:31:36 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:31:36 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:46:56 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:46:56 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:47:03 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:47:03 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token signature
+[06-Mar-2026 10:51:16 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 10:51:16 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 10:51:19 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 10:51:19 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:02:28 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:02:28 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:02:34 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:02:34 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:05:20 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:05:20 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:05:25 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:05:25 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:12:45 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:12:45 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:12:50 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:12:50 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:13:51 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:13:51 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:13:55 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:13:55 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:14:23 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:14:23 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:14:27 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:14:27 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:25:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:25:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:26:06 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:26:06 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:33:18 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:33:18 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:33:26 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:33:26 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:57:14 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 11:57:14 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 11:57:23 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 11:57:23 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 12:22:41 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 12:22:41 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 12:22:49 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 12:22:49 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:14:18 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:14:18 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:15:00 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:15:00 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:15:31 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:15:31 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:16:08 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:16:08 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138

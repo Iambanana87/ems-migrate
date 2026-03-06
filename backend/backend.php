@@ -21,8 +21,15 @@ $IS_API = ($_SERVER['REQUEST_METHOD'] === 'POST')
 ob_start();
 
 if ($IS_API) {
-  // API: bắt buộc Authorization header
-  $AUTH = require_auth_header();
+  try {
+      $AUTH = require_auth_header();
+  } catch (Exception $e) {
+      if (ob_get_length()) { ob_clean(); }
+      header('Content-Type: application/json; charset=utf-8');
+      http_response_code(401);
+      echo json_encode(['status'=>'error', 'message'=>'Unauthorized: ' . $e->getMessage()]);
+      exit;
+  }
 } else {
   // UI: cho phép đọc từ cookie 
   $AUTH = auth_user_or_null_ui();
@@ -376,7 +383,14 @@ switch ($action) {
 }
   } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    send_json_response(['status'=>'error','message'=>$e->getMessage()]);
+    $msg = $e->getMessage();
+    $code = 400;
+    if (stripos($msg, 'already exists') !== false) {
+        $code = 409;
+    } elseif (stripos($msg, 'not found') !== false) {
+        $code = 404;
+    }
+    send_json_response(['status'=>'error','message'=>$msg], $code);
   }
 }
 
@@ -447,49 +461,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && (($_GET['action'] ?? '') === 'device
 
 // ===== List actions by device_id =====
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && (($_GET['action'] ?? '') === 'actions_by_device')) {
-  $device_id = trim($_GET['device_id'] ?? '');
-  if ($device_id === '') { send_json_response([]); }
+  try {
+    $device_id = trim($_GET['device_id'] ?? '');
+    if ($device_id === '') { send_json_response([]); }
 
-  $sql = "SELECT
-            a.id,
-            a.device_id,
-            a.title,
-            a.priority,
-            a.status,
-            a.approval_status,
-            a.due_date,
-            a.created_at,
-            a.assigned_to_user_id,
-            u.username AS assigned_to,
-            GROUP_CONCAT(DISTINCT uv.username ORDER BY uv.username SEPARATOR ', ') AS verified_people,
-            MAX(v.verified_at) AS last_verified_at,
-            a.short_form,
-            CASE
-              WHEN a.status IN ('done','completed') THEN a.status
-              WHEN a.approval_status = 'approved' THEN 'done'
-              WHEN MAX(v.verified_at) IS NOT NULL THEN 'done'
-              ELSE a.status
-            END AS status_display
-          FROM device_actions a
-          LEFT JOIN users u ON u.id = a.assigned_to_user_id
-          LEFT JOIN device_action_verifications v ON v.action_id = a.id
-          LEFT JOIN users uv ON uv.id = v.user_id
-          WHERE a.device_id = ?
-          GROUP BY a.id
-          ORDER BY a.id DESC";
+    $sql = "SELECT
+              a.id,
+              a.device_id,
+              a.title,
+              a.priority,
+              a.status,
+              a.approval_status,
+              a.due_date,
+              a.created_at,
+              a.assigned_to_user_id,
+              u.username AS assigned_to,
+              GROUP_CONCAT(DISTINCT uv.username ORDER BY uv.username SEPARATOR ', ') AS verified_people,
+              MAX(v.verified_at) AS last_verified_at,
+              a.short_form,
+              CASE
+                WHEN a.status IN ('done','completed') THEN a.status
+                WHEN a.approval_status = 'approved' THEN 'done'
+                WHEN MAX(v.verified_at) IS NOT NULL THEN 'done'
+                ELSE a.status
+              END AS status_display
+            FROM device_actions a
+            LEFT JOIN users u ON u.id = a.assigned_to_user_id
+            LEFT JOIN device_action_verifications v ON v.action_id = a.id
+            LEFT JOIN users uv ON uv.id = v.user_id
+            WHERE a.device_id = ?
+            GROUP BY a.id
+            ORDER BY a.id DESC";
 
-  $stmt = $pdo->prepare($sql);
-  $stmt->execute([$device_id]);
-  $rows = $stmt->fetchAll();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$device_id]);
+    $rows = $stmt->fetchAll();
 
-  foreach ($rows as &$r) {
-    $sf = $r['short_form'] ?? '[]';
-    $decoded = json_decode($sf, true);
-    $r['short_form'] = is_array($decoded) ? $decoded : [];
+    foreach ($rows as &$r) {
+      $sf = $r['short_form'] ?? '[]';
+      $decoded = json_decode($sf, true);
+      $r['short_form'] = is_array($decoded) ? $decoded : [];
+    }
+    unset($r);
+
+    send_json_response($rows);
+  } catch (Exception $e) {
+    send_json_response(['status' => 'error', 'message' => $e->getMessage()], 400);
   }
-  unset($r);
-
-  send_json_response($rows);
 }
 
 // --- JSON API cho phần Config (lấy thiết bị đã group) ---
@@ -866,7 +884,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
   } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    send_json_response(['status' => 'error', 'message' => $e->getMessage()]);
+    $msg = $e->getMessage();
+    $code = 400;
+    if (stripos($msg, 'already exists') !== false) {
+        $code = 409;
+    } elseif (stripos($msg, 'not found') !== false) {
+        $code = 404;
+    }
+    send_json_response(['status' => 'error', 'message' => $msg], $code);
   }
 
   

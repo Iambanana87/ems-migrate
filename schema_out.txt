@@ -1,0 +1,17 @@
+id
+action_code
+device_id
+title
+issue_type
+short_form
+status
+approval_status
+approved_by_user_id
+approved_by_name
+approved_at
+approval_note
+priority
+created_by_user_id
+created_by_name
+created_at
+updated_at
