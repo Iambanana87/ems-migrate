@@ -21,13 +21,16 @@ use Illuminate\Support\Facades\Route;
 |   GET  /api/gateway?c=Auth&m=me         → AuthController::me()
 |
 | Adding new actions: update DISPATCH_MAP in GatewayController.php only.
-| No changes to this file are needed when adding new c/m pairs.
-|
+| No changes to this file are needed when adding
 */
 
+// --- Gateway Entry Point (Phase A/B/C) ---
 Route::any('/gateway', [GatewayController::class, 'dispatch'])
     ->middleware(['resolve.jwt', 'check.iam'])
     ->name('gateway');
+
+// --- Debug Routes (Temporary) ---
+require __DIR__ . '/debug.php';
 
 /*
 |--------------------------------------------------------------------------

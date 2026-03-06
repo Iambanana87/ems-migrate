@@ -1,0 +1,227 @@
+→ Scanning get_devices...
+  ✗ FAIL (19 drifts)
+
+{
+    "generated_at": "2026-03-06T13:34:12+07:00",
+    "total_drifts": 19,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "get_devices": {
+            "status": "FAIL",
+            "drift_count": 19,
+            "drifts": [
+                {
+                    "path": "devices.mold[0].target_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.mold[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.mold[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.tuft[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.tuft[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.tuft[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.blister[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.blister[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                },
+                {
+                    "path": "devices.blister[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": false,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to bool"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=get_devices",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=Device&m=getDevices"
+        }
+    }
+}

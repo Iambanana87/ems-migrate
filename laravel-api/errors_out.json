@@ -1,0 +1,6 @@
+{
+    "add": "Fetch failed: HTTP request returned status code 409:\n{\"status\":\"error\",\"message\":\"Device ID already exists.\"}",
+    "delete": "Fetch failed: HTTP request returned status code 404:\n{\"status\":\"error\",\"message\":\"Device not found.\"}",
+    "approve_action": "Fetch failed: HTTP request returned status code 400:\n{\"status\":\"error\",\"message\":\"Action not found.\"}",
+    "reject_action": "Fetch failed: HTTP request returned status code 400:\n{\"status\":\"error\",\"message\":\"Action not found.\"}"
+}

@@ -1,0 +1,33 @@
+﻿ΓåÆ Scanning search_device...
+  Γ£ù FAIL (1 drifts)
+
+{
+    "generated_at": "2026-03-06T14:03:28+07:00",
+    "total_drifts": 1,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "search_device": {
+            "status": "FAIL",
+            "drift_count": 1,
+            "drifts": [
+                {
+                    "path": "",
+                    "type": "type_mismatch",
+                    "legacy": [],
+                    "laravel": {
+                        "status": "ok",
+                        "total": 0,
+                        "data": []
+                    },
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from list to object"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=search_device&device_id=MOLD-01&from=2025-01-01+00%3A00%3A00&to=2025-01-07+23%3A59%3A59",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=Device&m=history&device_id=MOLD-01&from=2025-01-01+00%3A00%3A00&to=2025-01-07+23%3A59%3A59"
+        }
+    }
+}

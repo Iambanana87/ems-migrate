@@ -1,0 +1,128 @@
+﻿ΓåÆ Scanning get_devices...
+  Γ£ù FAIL (10 drifts)
+
+{
+    "generated_at": "2026-03-06T13:38:11+07:00",
+    "total_drifts": 10,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "get_devices": {
+            "status": "FAIL",
+            "drift_count": 10,
+            "drifts": [
+                {
+                    "path": "devices.mold[0].target_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.mold[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.tuft[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[0].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[1].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                },
+                {
+                    "path": "devices.blister[2].efficiency_lower_limit",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": 0,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from float to int"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=get_devices",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=Device&m=getDevices"
+        }
+    }
+}

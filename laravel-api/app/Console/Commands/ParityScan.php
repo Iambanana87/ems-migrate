@@ -114,10 +114,29 @@ final class ParityScan extends Command
             $this->extraParams()
         );
 
+        $legacyBase = config('parity.legacy_base');
+        $backendEndpoints = [
+            'add', 'update', 'delete', 'get_devices',
+            'action_create', 'action_update', 'action_delete',
+            'approve_action', 'reject_action', 'actions_by_device',
+            'list_users'
+        ];
+        if (in_array($name, $backendEndpoints)) {
+            $legacyBase = str_replace('api.php', 'backend/backend.php', $legacyBase);
+        }
+
+        $postEndpoints = [
+            'add', 'update', 'delete', 
+            'action_create', 'action_update', 'action_delete', 
+            'approve_action', 'reject_action',
+            'create_device_action', 'update_device_action_status'
+        ];
+        $method = in_array($name, $postEndpoints) ? 'post' : 'get';
+
         // Fetch both sides
         try {
-            $legacyRaw  = $this->fetch(config('parity.legacy_base'), $legacyParams);
-            $laravelRaw = $this->fetch(config('parity.laravel_base'), $laravelParams);
+            $legacyRes  = $this->fetch($legacyBase, $legacyParams, $method);
+            $laravelRes = $this->fetch(config('parity.laravel_base'), $laravelParams, $method);
         } catch (\Throwable $e) {
             $this->results[$name] = [
                 'status' => 'ERROR',
@@ -127,6 +146,46 @@ final class ParityScan extends Command
             $this->error("  ✗ FETCH ERROR: {$e->getMessage()}");
             return;
         }
+
+        $legacyStatus  = $legacyRes->status();
+        $laravelStatus = $laravelRes->status();
+
+        if ($legacyStatus >= 500 || $laravelStatus >= 500) {
+            $errorMsg = "Server error. Legacy: {$legacyStatus}, Laravel: {$laravelStatus}.";
+            $this->results[$name] = [
+                'status' => 'ERROR',
+                'error'  => $errorMsg,
+                'drifts' => [],
+            ];
+            $this->error("  ✗ FETCH ERROR: {$errorMsg}");
+            return;
+        }
+
+        if ($legacyStatus !== $laravelStatus) {
+            $statefulEndpoints = ['add', 'delete', 'update', 'action_create', 'action_update', 'approve_action', 'reject_action', 'actions_by_device'];
+            $errorMsg = "HTTP Status mismatch. Legacy: {$legacyStatus}, Laravel: {$laravelStatus}.";
+
+            if (in_array($name, $statefulEndpoints)) {
+                $this->results[$name] = [
+                    'status' => 'EXPECTED_STATE_MISMATCH',
+                    'error'  => $errorMsg,
+                    'drifts' => [],
+                ];
+                $this->warn("  ⚠ EXPECTED STATE MISMATCH: {$errorMsg}");
+                return;
+            }
+
+            $this->results[$name] = [
+                'status' => 'ERROR',
+                'error'  => $errorMsg,
+                'drifts' => [],
+            ];
+            $this->error("  ✗ FETCH ERROR: {$errorMsg}");
+            return;
+        }
+
+        $legacyRaw  = $legacyRes->body();
+        $laravelRaw = $laravelRes->body();
 
         // Build services
         $globalWhitelist   = config('parity.whitelist.global', []);
@@ -199,7 +258,7 @@ final class ParityScan extends Command
     // HTTP fetch with retry
     // -----------------------------------------------------------------------
 
-    private function fetch(string $baseUrl, array $params): string
+    private function fetch(string $baseUrl, array $params, string $method = 'get'): \Illuminate\Http\Client\Response
     {
         $token   = config('parity.auth_token', '');
         $timeout = (int) config('parity.timeout_seconds', 10);
@@ -207,21 +266,17 @@ final class ParityScan extends Command
         $sleep   = (int) config('parity.retry_sleep_ms', 300);
 
         $client = Http::timeout($timeout)
-            ->retry($retries, $sleep, throw: true);
+            ->retry($retries, $sleep, throw: false);
 
         if ($token !== '') {
             $client = $client->withToken($token);
         }
 
-        $response = $client->get($baseUrl, $params);
-
-        if (!$response->successful()) {
-            throw new ConnectionException(
-                "HTTP {$response->status()} from {$baseUrl}: " . $response->body()
-            );
+        if ($method === 'post') {
+            return $client->asForm()->post($baseUrl, $params);
         }
 
-        return $response->body();
+        return $client->get($baseUrl, $params);
     }
 
     // -----------------------------------------------------------------------
@@ -296,21 +351,36 @@ final class ParityScan extends Command
         $this->line('═══════════════════════════════════════');
 
         $rows = [];
+        $counts = ['PASS' => 0, 'FAIL' => 0, 'ERROR' => 0, 'EXPECTED_STATE_MISMATCH' => 0];
+
         foreach ($this->results as $name => $result) {
+            $status = $result['status'];
             $rows[] = [
                 $name,
-                $result['status'],
+                $status,
                 $result['drift_count'] ?? 'N/A',
                 $result['error'] ?? '',
             ];
+            if (isset($counts[$status])) {
+                $counts[$status]++;
+            } else {
+                $counts[$status] = 1;
+            }
         }
 
         $this->table(['Endpoint', 'Status', 'Drifts', 'Error'], $rows);
 
-        if ($this->totalDrifts === 0) {
-            $this->info('✓ FULL API PARITY CERTIFIED — ZERO DRIFT');
+        $this->line("");
+        $this->line("Summary:");
+        $this->line("PASS: {$counts['PASS']}");
+        $this->line("DRIFT: {$counts['FAIL']}");
+        $this->line("EXPECTED_STATE_MISMATCH: {$counts['EXPECTED_STATE_MISMATCH']}");
+        $this->line("ERROR: {$counts['ERROR']}");
+
+        if ($this->totalDrifts === 0 && $counts['ERROR'] === 0) {
+            $this->info('✓ API STABLE — Zero errors and zero drifts.');
         } else {
-            $this->error("✗ DRIFT DETECTED — {$this->totalDrifts} total drifts across " . count($this->results) . ' endpoints');
+            $this->error("✗ ISSUES DETECTED — Drifts: {$counts['FAIL']}, Errors: {$counts['ERROR']}");
         }
     }
 

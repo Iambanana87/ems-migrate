@@ -1,0 +1,11 @@
+{
+    "add": "HTTP Status mismatch. Legacy: 200, Laravel: 409.",
+    "update": "JSON decode failed: Syntax error",
+    "delete": "HTTP Status mismatch. Legacy: 200, Laravel: 404.",
+    "action_create": "JSON decode failed: Syntax error",
+    "action_update": "JSON decode failed: Syntax error",
+    "action_delete": "HTTP Status mismatch. Legacy: 200, Laravel: 400.",
+    "approve_action": "HTTP Status mismatch. Legacy: 200, Laravel: 400.",
+    "reject_action": "HTTP Status mismatch. Legacy: 200, Laravel: 400.",
+    "actions_by_device": "Server error. Legacy: 500, Laravel: 200."
+}

@@ -1,0 +1,117 @@
+﻿ΓåÆ Scanning get_devices...
+  Γ£ù FAIL (9 drifts)
+
+{
+    "generated_at": "2026-03-06T14:12:08+07:00",
+    "total_drifts": 9,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "get_devices": {
+            "status": "FAIL",
+            "drift_count": 9,
+            "drifts": [
+                {
+                    "path": "devices.mold[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.mold[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.mold[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.tuft[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.tuft[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.tuft[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.blister[0].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.blister[1].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                },
+                {
+                    "path": "devices.blister[2].flex",
+                    "type": "type_mismatch",
+                    "legacy": 0,
+                    "laravel": "",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Type changed from int to string"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=get_devices",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=Device&m=getDevices"
+        }
+    }
+}

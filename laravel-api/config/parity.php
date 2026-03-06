@@ -109,8 +109,8 @@ return [
 
         // --- API SCOPE (Uncertified) ---
         'search_device' => [
-            'legacy_params'  => ['action' => 'search_device', 'device_id' => 'MOLD-01', 'from' => '2025-01-01', 'to' => '2025-01-07'],
-            'laravel_params' => ['c' => 'Device', 'm' => 'history', 'device_id' => 'MOLD-01', 'from' => '2025-01-01', 'to' => '2025-01-07'],
+            'legacy_params'  => ['action' => 'search_device', 'device_id' => 'MOLD-01', 'from' => '2025-01-01 00:00:00', 'to' => '2025-01-07 23:59:59'],
+            'laravel_params' => ['c' => 'Device', 'm' => 'history', 'device_id' => 'MOLD-01', 'from' => '2025-01-01 00:00:00', 'to' => '2025-01-07 23:59:59'],
             'sample_key'     => null,
         ],
         'get_summary_report' => [
@@ -164,13 +164,13 @@ return [
             'sample_key'     => null,
         ],
         'update_device_action_status' => [
-            'legacy_params'  => ['action' => 'update_device_action_status', 'action_id' => '99999', 'status' => 'done'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'update', 'action_id' => '99999', 'status' => 'done'],
+            'legacy_params'  => ['action' => 'update_device_action_status', 'action_id' => '100000', 'status' => 'done'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'update', 'action_id' => '100000', 'status' => 'done'],
             'sample_key'     => null,
         ],
         'list_action_plans' => [
-            'legacy_params'  => ['action' => 'list_action_plans', 'action_id' => '99999'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'listActionPlans', 'action_id' => '99999'],
+            'legacy_params'  => ['action' => 'list_action_plans', 'action_id' => '100000'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'listActionPlans', 'action_id' => '100000'],
             'sample_key'     => null,
         ],
         'get_total_count' => [
@@ -181,8 +181,8 @@ return [
 
         // --- BACKEND SCOPE (Uncertified) ---
         'add' => [
-            'legacy_params'  => ['action' => 'add', 'device_id' => 'PARITY-TEST-01', 'display_type' => 'mold'],
-            'laravel_params' => ['c' => 'Device', 'm' => 'store', 'device_id' => 'PARITY-TEST-01', 'display_type' => 'mold'],
+            'legacy_params'  => ['action' => 'add', 'device_id' => 'PARITY-TEST-01', 'display_type' => 'mold', 'product' => 'Family A', 'target_limit' => 0, 'cavities' => 1],
+            'laravel_params' => ['c' => 'Device', 'm' => 'store', 'device_id' => 'PARITY-TEST-01', 'display_type' => 'mold', 'product' => 'Family A', 'target_limit' => 0, 'cavities' => 1],
             'sample_key'     => null,
         ],
         'update' => [
@@ -206,23 +206,23 @@ return [
             'sample_key'     => null,
         ],
         'action_update' => [
-            'legacy_params'  => ['action' => 'action_update', 'action_id' => '99999'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'updateBackend', 'action_id' => '99999'],
+            'legacy_params'  => ['action' => 'action_update', 'action_id' => '100000'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'updateBackend', 'action_id' => '100000'],
             'sample_key'     => null,
         ],
         'action_delete' => [
-            'legacy_params'  => ['action' => 'action_delete', 'action_id' => '99999'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'destroy', 'id' => '99999'],
+            'legacy_params'  => ['action' => 'action_delete', 'action_id' => '100000'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'destroy', 'id' => '100000'],
             'sample_key'     => null,
         ],
         'approve_action' => [
-            'legacy_params'  => ['action' => 'approve_action', 'action_id' => '99999'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'approve', 'id' => '99999'],
+            'legacy_params'  => ['action' => 'approve_action', 'action_id' => '100000'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'approve', 'id' => '100000'],
             'sample_key'     => null,
         ],
         'reject_action' => [
-            'legacy_params'  => ['action' => 'reject_action', 'action_id' => '99999'],
-            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'reject', 'id' => '99999'],
+            'legacy_params'  => ['action' => 'reject_action', 'action_id' => '100000', 'reason' => 'Parity Scan Rejection'],
+            'laravel_params' => ['c' => 'DeviceAction', 'm' => 'reject', 'id' => '100000', 'reason' => 'Parity Scan Rejection'],
             'sample_key'     => null,
         ],
         'actions_by_device' => [

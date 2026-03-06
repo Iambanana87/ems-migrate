@@ -66,6 +66,17 @@ class ResolveJwtUser
     {
         // 1) Prefer Authorization: Bearer (standard API header)
         $bearer = $request->bearerToken();
+        if ($bearer === null || $bearer === '') {
+            // Check common Apache/REDIRECT fallbacks if standard bearerToken() fails
+            $auth = $request->header('Authorization') 
+                 ?? $request->server('HTTP_AUTHORIZATION') 
+                 ?? $request->server('REDIRECT_HTTP_AUTHORIZATION');
+            
+            if (is_string($auth) && preg_match('/Bearer\s+(.*)$/i', $auth, $matches)) {
+                $bearer = $matches[1];
+            }
+        }
+
         if ($bearer !== null && $bearer !== '') {
             return $bearer;
         }

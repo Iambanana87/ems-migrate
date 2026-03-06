@@ -1,0 +1,80 @@
+﻿ΓåÆ Scanning create_device_action...
+  Γ£ù FAIL (4 drifts)
+
+{
+    "generated_at": "2026-03-06T14:16:09+07:00",
+    "total_drifts": 4,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "create_device_action": {
+            "status": "FAIL",
+            "drift_count": 4,
+            "drifts": [
+                {
+                    "path": "error",
+                    "type": "missing_key",
+                    "legacy": "Missing device_id\/title",
+                    "laravel": null,
+                    "absent": {
+                        "legacy": false,
+                        "laravel": true
+                    },
+                    "detail": "Key present in legacy but absent in Laravel"
+                },
+                {
+                    "path": "status",
+                    "type": "extra_key",
+                    "legacy": null,
+                    "laravel": "ok",
+                    "absent": {
+                        "legacy": true,
+                        "laravel": false
+                    },
+                    "detail": "Key absent in legacy but present in Laravel"
+                },
+                {
+                    "path": "message",
+                    "type": "extra_key",
+                    "legacy": null,
+                    "laravel": "Action created.",
+                    "absent": {
+                        "legacy": true,
+                        "laravel": false
+                    },
+                    "detail": "Key absent in legacy but present in Laravel"
+                },
+                {
+                    "path": "data",
+                    "type": "extra_key",
+                    "legacy": null,
+                    "laravel": {
+                        "id": 100023,
+                        "action_code": null,
+                        "device_id": "MOLD-01",
+                        "title": "Test Parity Action",
+                        "issue_type": null,
+                        "short_form": "[]",
+                        "status": "open",
+                        "approval_status": "pending",
+                        "approved_by_user_id": null,
+                        "approved_by_name": null,
+                        "approved_at": null,
+                        "approval_note": null,
+                        "priority": 0,
+                        "created_by_user_id": null,
+                        "created_by_name": "parity_scan",
+                        "created_at": "2026-03-06T07:16:09.000000Z",
+                        "updated_at": "2026-03-06T07:16:09.000000Z"
+                    },
+                    "absent": {
+                        "legacy": true,
+                        "laravel": false
+                    },
+                    "detail": "Key absent in legacy but present in Laravel"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=create_device_action&device_id=MOLD-01&title=Test+Parity+Action",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=DeviceAction&m=store&device_id=MOLD-01&title=Test+Parity+Action"
+        }
+    }
+}

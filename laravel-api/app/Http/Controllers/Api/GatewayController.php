@@ -14,9 +14,11 @@ use App\Http\Controllers\Api\DeviceStatusController;
 use App\Http\Controllers\Api\FactoryLayoutController;
 use App\Http\Controllers\Api\FamilyController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * GatewayController
@@ -204,12 +206,18 @@ class GatewayController extends Controller
             return $response;
         } catch (\Illuminate\Http\Exceptions\HttpResponseException $e) {
             return $e->getResponse();
+        } catch (HttpException $e) {
+            // Handle standard abort(code, message) without "Crashing" the gateway.
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
         } catch (\Throwable $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Gateway Crash: ' . $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine()
             ], 500);
         }
     }

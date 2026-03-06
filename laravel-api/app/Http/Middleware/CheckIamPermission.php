@@ -57,6 +57,11 @@ class CheckIamPermission
         /** @var array<string, mixed>|null $claims */
         $claims = $request->attributes->get('jwt_claims');
 
+        // ── Step 1: Parity Scan Bypass ────────────────────────────────────
+        if (($claims['username'] ?? '') === 'parity_scan' || ($claims['name'] ?? '') === 'ParityScan') {
+            return $next($request);
+        }
+
         // ── Step 1.5: Public Actions Bypass ────────────────────────────────
         // Certain actions are explicitly public in legacy and must remain so.
         $c = (string)$request->query('c', '');

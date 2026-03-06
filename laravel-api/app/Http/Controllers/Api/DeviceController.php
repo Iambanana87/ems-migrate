@@ -144,7 +144,7 @@ class DeviceController extends Controller
             ], 404);
         }
 
-        return response()->json($result);
+        return response()->json($result['data'] ?? []);
     }
 
     /*
@@ -455,7 +455,18 @@ class DeviceController extends Controller
         foreach ($devices as $d) {
             $type = $d->display_type;
             if (isset($grouped[$type])) {
-                $grouped[$type][] = $d->toArray();
+                $item = $d->toArray();
+                
+                // Parity Alignment: Legacy PDO (XAMPP/Windows) often returns all fields as strings.
+                // We map over the array and cast all non-null values to strings.
+                // Special care for booleans: bool false stringifies to "" in PHP, but legacy needs "0".
+                $item = array_map(function($value) {
+                    if ($value === null) return null;
+                    if (is_bool($value)) return $value ? '1' : '0';
+                    return (string) $value;
+                }, $item);
+                
+                $grouped[$type][] = $item;
             }
         }
 

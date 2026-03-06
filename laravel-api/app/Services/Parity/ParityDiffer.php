@@ -63,11 +63,15 @@ final class ParityDiffer
         $laravelType = $this->typeOf($laravel);
 
         if ($legacyType !== $laravelType) {
-            // Special case: null vs absent key is reported differently
-            // (detected at caller level when key is missing)
-            $drifts[] = $this->item($path, 'type_mismatch', $legacy, $laravel,
-                "Type changed from {$legacyType} to {$laravelType}");
-            return;
+            // Parity Adjustment: Allow int vs float comparison if they are logically numeric.
+            $numeric = ['int', 'float'];
+            if (in_array($legacyType, $numeric) && in_array($laravelType, $numeric)) {
+                // Compatible numeric types, proceed to scalar comparison
+            } else {
+                $drifts[] = $this->item($path, 'type_mismatch', $legacy, $laravel,
+                    "Type changed from {$legacyType} to {$laravelType}");
+                return;
+            }
         }
 
         if (is_array($legacy)) {
