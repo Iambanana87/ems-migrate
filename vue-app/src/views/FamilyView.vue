@@ -8,6 +8,7 @@ const loading = ref(false);
 const families = ref([]);
 const selectedFamily = ref("");
 const tableData = ref([]);
+const error = ref(null);
 
 // Date formatting utility for the local input fallback
 const toLocalInputValue = (d) => {
@@ -29,45 +30,20 @@ const fromDateInitial = new Date(today7.getTime() - 24 * 3600 * 1000);
 const fromDate = ref(toLocalInputValue(fromDateInitial));
 const toDate = ref(toLocalInputValue(today7));
 
-// Mock fixed family list from legacy family.html
-const FAMILY_WHITELIST = [
-  "Alpha",
-  "Arjun (Oral-B)",
-  "Bane",
-  "Classic 35 (Oral-B) ST",
-  "Classic 40 (Oral-B)",
-  "Gucci (Oral-B)",
-  "Indicator 35 (IU35)",
-  "Jordan Green family",
-  "Jordan Step 1",
-  "Jordan Step 2",
-  "Jordan Step 3",
-  "Robinhood (Oral-B)",
-  "Sherwood 40 (Oral-B)",
-  "Wisdom Adult",
-  "Wisdom Kids",
-  "ZAHA Junior",
-  "ZAHA Kids",
-];
-
 // --- API ---
 const fetchData = async () => {
   loading.value = true;
+  error.value = null;
   try {
-    // In Phase 7, we mock the heavy API bulk call logic since the backend API
-    // returns a complex matrix that is strictly handled natively in FamilyView
-    // The legacy code used `fetchBulkAndRender` sequentially calling `fetchOneProcess` map.
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    tableData.value = generateMockFamilyData();
-
-    // Legacy behavior dynamically populated families, but heavily relied on whitelist
-    families.value = FAMILY_WHITELIST;
-  } catch (error) {
-    console.warn("Fallback to mock data", error);
-    tableData.value = generateMockFamilyData();
-    families.value = FAMILY_WHITELIST;
+    const response = await api.get("", { params: { c: "Family", m: "index" } });
+    tableData.value = response.data?.data || response.data || [];
+    const uniqueFamilies = [...new Set(tableData.value.map((row) => row.family))];
+    families.value = uniqueFamilies;
+  } catch (err) {
+    console.error("Failed to load family data", err);
+    error.value = err.message || "Failed to load family data.";
+    tableData.value = [];
+    families.value = [];
   } finally {
     loading.value = false;
   }
@@ -147,27 +123,6 @@ const effClass = (v) => {
   return "bg-[#fdecec] border-[#ef4444] text-[#7f1d1d]";
 };
 
-// --- Mock Data ---
-function generateMockFamilyData() {
-  return FAMILY_WHITELIST.map((fam) => {
-    const r = Math.random() > 0.5;
-    return {
-      family: fam,
-      mold: {
-        output: r ? Math.floor(Math.random() * 50000) : 0,
-        eff: r ? Math.random() * 40 + 60 : 0,
-      },
-      tuft: {
-        output: r ? Math.floor(Math.random() * 45000) : 0,
-        eff: r ? Math.random() * 40 + 60 : 0,
-      },
-      blister: {
-        output: r ? Math.floor(Math.random() * 40000) : 0,
-        eff: r ? Math.random() * 40 + 60 : 0,
-      },
-    };
-  });
-}
 </script>
 
 <template>
@@ -232,6 +187,11 @@ function generateMockFamilyData() {
           </span>
         </button>
       </div>
+    </div>
+
+    <!-- Error State -->
+    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
     </div>
 
     <!-- Tables Grid -->

@@ -5,6 +5,7 @@ import { usePolling } from "../composables/usePolling";
 
 // --- State ---
 const loading = ref(true);
+const error = ref(null);
 const dashboardData = ref({
   mold: createEmptyProcessData(),
   tuft: createEmptyProcessData(),
@@ -31,26 +32,25 @@ function createEmptyProcessData() {
 
 // --- API ---
 const fetchData = async () => {
+  loading.value = true;
+  error.value = null;
   try {
-    // In Phase 6, we stub the complex API combining exactly as backend expected,
-    // or simulate it if the backend is not fully ported for dashboard yet.
-    // For now we try to fetch, if fail we set mock data so the UI renders.
-
-    // Simulate API combined call from legacy app.js
-    const [summaryRes, liveRes] = await Promise.allSettled([
-      api.get("", { params: { action: "get_summary_report" } }),
-      api.get("", { params: { view: "all" } }),
-    ]);
-
-    if (summaryRes.status === "fulfilled" && liveRes.status === "fulfilled") {
-      // Assuming successful parse logic here based on actual API
-      // For this phase, we ensure the UI matches vanilla behavior.
-    } else {
-      throw new Error("Fallback to mock data");
+    const response = await api.get("", { params: { c: "Report", m: "summary" } });
+    if (response.data) {
+      dashboardData.value = {
+        mold: response.data.mold || createEmptyProcessData(),
+        tuft: response.data.tuft || createEmptyProcessData(),
+        blister: response.data.blister || createEmptyProcessData()
+      };
     }
-  } catch (error) {
-    console.warn("Using mock dashboard data", error);
-    dashboardData.value = generateMockDashboardData();
+  } catch (err) {
+    console.error("Failed to load dashboard data", err);
+    error.value = err.message || "Failed to load dashboard data.";
+    dashboardData.value = {
+      mold: createEmptyProcessData(),
+      tuft: createEmptyProcessData(),
+      blister: createEmptyProcessData()
+    };
   } finally {
     loading.value = false;
   }
@@ -78,56 +78,6 @@ const openOutputPopup = (process, slot) => {
 const formatNum = (num) => Number(num).toLocaleString("en-US");
 const formatEff = (num) => Number(num).toFixed(2);
 
-// --- Mock Data ---
-function generateMockDashboardData() {
-  return {
-    mold: {
-      status: { total: 42, running: 38, breakdown: 1, warning: 3 },
-      efficiency: { day: 85.4, night: 82.1, average: 83.75 },
-      output: {
-        day: 15400,
-        night: 14200,
-        total: 29600,
-        day_lost_pcs: 50,
-        day_loss_percent: 0.3,
-        night_lost_pcs: 80,
-        night_loss_percent: 0.5,
-        total_lost_pcs: 130,
-        total_loss_percent: 0.4,
-      },
-    },
-    tuft: {
-      status: { total: 28, running: 25, breakdown: 2, warning: 1 },
-      efficiency: { day: 91.2, night: 88.5, average: 89.85 },
-      output: {
-        day: 42000,
-        night: 39500,
-        total: 81500,
-        day_lost_pcs: 120,
-        day_loss_percent: 0.2,
-        night_lost_pcs: 150,
-        night_loss_percent: 0.3,
-        total_lost_pcs: 270,
-        total_loss_percent: 0.25,
-      },
-    },
-    blister: {
-      status: { total: 15, running: 15, breakdown: 0, warning: 0 },
-      efficiency: { day: 95.5, night: 94.2, average: 94.85 },
-      output: {
-        day: 12500,
-        night: 12100,
-        total: 24600,
-        day_lost_pcs: 10,
-        day_loss_percent: 0.08,
-        night_lost_pcs: 15,
-        night_loss_percent: 0.12,
-        total_lost_pcs: 25,
-        total_loss_percent: 0.1,
-      },
-    },
-  };
-}
 </script>
 
 <template>
@@ -151,6 +101,10 @@ function generateMockDashboardData() {
       <div
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
       ></div>
+    </div>
+    
+    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-4" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
     </div>
 
     <table

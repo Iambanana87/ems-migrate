@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive } from "vue";
+import api from "../../services/api";
 import Modal from "../ui/Modal.vue";
 
 const props = defineProps({
@@ -26,9 +27,27 @@ const form = reactive({
   lowerLimit: "",
 });
 
-const submitForm = () => {
-  emit("submit", { ...form, deviceId: props.device?.device_id });
-  close();
+const loading = ref(false);
+const error = ref(null);
+
+const submitForm = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await api.post("", {
+      c: "DeviceAction",
+      m: "store",
+      device_id: props.device?.device_id,
+      ...form
+    });
+    emit("submit", { ...form, deviceId: props.device?.device_id });
+    close();
+  } catch (err) {
+    console.error("Failed to create action:", err);
+    error.value = err.message || "Failed to create action.";
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
@@ -44,6 +63,10 @@ const submitForm = () => {
         @submit.prevent="submitForm"
         class="space-y-5 mt-2 max-h-[70vh] px-1 overflow-x-hidden"
       >
+        <div v-if="error" class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+          {{ error }}
+        </div>
+
         <!-- Exact form port from index.html 444-551 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -171,8 +194,10 @@ const submitForm = () => {
         <button
           type="button"
           @click="submitForm"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          :disabled="loading"
+          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center"
         >
+          <span v-if="loading" class="mr-2">...</span>
           Create Action
         </button>
       </div>

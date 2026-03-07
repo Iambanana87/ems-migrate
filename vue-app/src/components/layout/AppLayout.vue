@@ -9,7 +9,7 @@ import Header from "./Header.vue";
 <template>
   <div class="ems-app-layout flex flex-col min-h-screen">
     <Header />
-    <main class="flex-grow bg-[#f4f6f9] p-4">
+    <main class="flex-grow bg-[#f4f6f9] p-0">
       <RouterView />
     </main>
   </div>

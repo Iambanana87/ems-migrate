@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 
 const loading = ref(false);
+const error = ref(null);
 const actions = ref([]);
 const activeTab = ref("timeline");
 const sidebarVisible = ref(false);
@@ -19,15 +20,16 @@ const dateTo = ref("");
 // Limit rows
 const MAX_RENDER = 200;
 
-// Mock API Call simulating `http://192.168.110.2/web_develop/ems/model/get_audit_trail.php`
 const loadData = async () => {
   loading.value = true;
+  error.value = null;
   try {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 600));
-    actions.value = generateMockAuditData();
+    const response = await api.get("", { params: { c: "Report", m: "actionsBoard" } });
+    actions.value = response.data?.data || response.data || [];
   } catch (err) {
     console.error("Failed to load audit data", err);
+    error.value = err.message || "Failed to load audit data.";
+    actions.value = [];
   } finally {
     loading.value = false;
   }
@@ -170,34 +172,6 @@ const formatDate = (ts) => {
 const capitalize = (str) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
-// Mock Data Generator
-function generateMockAuditData() {
-  const types = ["create", "update", "delete"];
-  const users = ["admin_hoang", "operator_linh", "sys_auto", "qc_nam"];
-  const reasons = [
-    "Updated device configuration",
-    "Acknowledged critical alarm",
-    "Deleted legacy plan",
-    "Added new shift schedule",
-    "Modified efficiency target",
-    "System boot completed",
-  ];
-
-  const now = new Date();
-  return Array.from({ length: 150 }).map((_, i) => {
-    const randHours = Math.floor(Math.random() * 72);
-    const timestamp = new Date(now.getTime() - randHours * 3600 * 1000);
-
-    return {
-      id: Math.floor(Math.random() * 10000) + 1000,
-      type: types[Math.floor(Math.random() * types.length)],
-      reason: reasons[Math.floor(Math.random() * reasons.length)],
-      who: users[Math.floor(Math.random() * users.length)],
-      created_at: timestamp.toISOString().replace("T", " ").slice(0, 19),
-      diff: { old: { status: "offline" }, new: { status: "online" } },
-    };
-  });
-}
 </script>
 
 <template>
@@ -286,6 +260,11 @@ function generateMockAuditData() {
           Filters
         </button>
       </div>
+    </div>
+
+    <!-- Error State -->
+    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
     </div>
 
     <!-- Stats Grid -->

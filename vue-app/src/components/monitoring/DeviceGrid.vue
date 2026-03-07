@@ -26,9 +26,7 @@ const handleDeviceClick = (device) => {
 </script>
 
 <template>
-  <div
-    class="device-grid grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 pt-2"
-  >
+  <div class="dashboard-grid" id="dashboard-grid">
     <template v-if="loading">
       <SkeletonCard v-for="n in 12" :key="n" />
     </template>
@@ -50,5 +48,17 @@ const handleDeviceClick = (device) => {
 </template>
 
 <style scoped>
-/* Grid handled by Tailwind */
+#dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1440px) {
+  #dashboard-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
 </style>
