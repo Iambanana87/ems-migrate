@@ -440,9 +440,19 @@ class DeviceController extends Controller
      */
     public function getDevices(): JsonResponse
     {
-        // requireAdmin() equivalent not enforced in legacy GET get_devices, 
-        // but we'll keep it consistent with the backend context.
-        $devices = \App\Models\Device::all();
+        // Join with live_device_data and device_status to provide full dashboard state
+        $devices = \Illuminate\Support\Facades\DB::table('devices')
+            ->leftJoin('live_device_data', 'devices.device_id', '=', 'live_device_data.device_id')
+            ->leftJoin('device_status', 'devices.device_id', '=', 'device_status.device_id')
+            ->select([
+                'devices.*',
+                'live_device_data.live_data',
+                'live_device_data.last_updated AS live_last_updated',
+                'device_status.connection_status',
+                'device_status.threshold_status',
+                'device_status.last_heartbeat'
+            ])
+            ->get();
         
         $grouped = [
             'mold'          => [],
@@ -455,13 +465,30 @@ class DeviceController extends Controller
         foreach ($devices as $d) {
             $type = $d->display_type;
             if (isset($grouped[$type])) {
-                $item = $d->toArray();
+                $item = (array) $d;
                 
-                // Parity Alignment: Legacy PDO (XAMPP/Windows) often returns all fields as strings.
-                // We map over the array and cast all non-null values to strings.
-                // Special care for booleans: bool false stringifies to "" in PHP, but legacy needs "0".
+                // Parse live_data JSON if present
+                if (isset($item['live_data']) && is_string($item['live_data'])) {
+                    $item['live_data'] = json_decode($item['live_data'], true);
+                }
+
+                // Determine contract status (NORMAL, BREACHED, DISCONNECTED)
+                // We use the same logic as the normalizer but here in the controller for performance.
+                $conn = $item['connection_status'] ?? 'Disconnected';
+                $thresh = $item['threshold_status'] ?? 'Normal';
+                
+                if (strtolower($conn) === 'disconnected') {
+                    $item['status'] = 'DISCONNECTED';
+                } elseif (strtolower($thresh) === 'breached' || strtolower($thresh) === 'warning') {
+                    $item['status'] = 'BREACHED';
+                } else {
+                    $item['status'] = 'NORMAL';
+                }
+
+                // Parity Alignment: Stringify values
                 $item = array_map(function($value) {
                     if ($value === null) return null;
+                    if (is_array($value) || is_object($value)) return $value; // Keep JSON as array/object
                     if (is_bool($value)) return $value ? '1' : '0';
                     return (string) $value;
                 }, $item);

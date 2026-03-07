@@ -22,7 +22,7 @@ class ActionIdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['required', 'integer', 'exists:device_actions,id'],
+            'id'    => ['required', 'integer'],
         ];
     }
 

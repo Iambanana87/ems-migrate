@@ -174,20 +174,28 @@ final class DeviceService
      *
      * @return list<array<string, mixed>>
      */
-    public function getLiveFeed(): array
+    public function getLiveFeed(string $viewType = 'mold'): array
     {
-        $devices = Device::withLiveFeed()->get();
+        $query = Device::withLiveFeed();
+        if ($viewType !== 'all') {
+            $query->where('display_type', $viewType);
+        }
+        $devices = $query->get();
 
         return $devices->map(function (Device $device): array {
             // Use pre-computed live_data cache if available
             if ($device->liveData && is_array($device->liveData->live_data)) {
                 $cached = $device->liveData->live_data;
 
-                return array_merge($cached, [
+                return array_merge($device->toArray(), $cached, [
+                    'id'                 => $device->id,
                     'device_id'          => $device->device_id,
                     'display_type'       => $device->display_type,
                     'process'            => $device->process,
-                    'flex'               => $device->flex,
+                    'flex'               => (int) $device->flex,
+                    'raw_capacity'       => $device->capacity,
+                    'old_conn_status'    => $device->status?->connection_status,
+                    'old_thres_status'   => $device->status?->threshold_status,                  
                     'status'             => $device->status?->connection_status ?? 'Disconnected',
                     'threshold_status'   => $device->status?->threshold_status  ?? 'Normal',
                     'last_heartbeat'     => $device->status?->last_heartbeat?->format('Y-m-d H:i:s'),
@@ -413,12 +421,16 @@ final class DeviceService
         $efficiency = $latest ? $this->computeEfficiency($device, $latest) : 0.0;
         $capacity   = $this->computeCapacity($device);
 
-        return [
+        return array_merge($device->toArray(), [
+            'id'               => $device->id,
             'device_id'        => $device->device_id,
             'display_type'     => $device->display_type,
             'process'          => $device->process,
             'product'          => $latest['product'] ?? $device->product,
-            'flex'             => $device->flex,
+            'flex'             => (int) $device->flex,
+            'raw_capacity'     => $device->capacity,
+            'old_conn_status'  => $device->status?->connection_status,
+            'old_thres_status' => $device->status?->threshold_status,
             'status'           => $device->status?->connection_status ?? 'Disconnected',
             'threshold_status' => $device->status?->threshold_status  ?? 'Normal',
             'last_heartbeat'   => $device->status?->last_heartbeat?->format('Y-m-d H:i:s'),
@@ -427,7 +439,7 @@ final class DeviceService
             'cycle_time'       => isset($latest['cycle_time']) ? round((float) $latest['cycle_time'], 2) : null,
             'target_limit'     => $device->target_limit,
             'capacity'         => round($capacity, 2),
-        ];
+        ]);
     }
 
     /**

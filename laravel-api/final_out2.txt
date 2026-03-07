@@ -1,0 +1,15 @@
+﻿=== REAL BACKEND RUNTIME TEST ===
+1. GET Devices: HTTP 200 in 164.43ms
+   Structure valid: YES
+2. POST Create Device: HTTP 401 - error
+   Error: {"status":"error","message":"auth_required"}
+3. POST Create Invalid: HTTP 400 - The target limit field is required.
+4. POST Update Device: HTTP 400 - error
+   DB updated limit: N/A
+
+--- Injecting 200 Dummy Devices ---
+5. GET 200+ Devices: HTTP 200 in 16.29ms
+   Total grouped in payload: 209
+6. POST Delete Device: HTTP 401 - error
+   Remains in DB: 0
+=== TEST END ===

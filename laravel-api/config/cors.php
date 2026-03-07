@@ -16,25 +16,20 @@
 
 return [
 
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['GET', 'POST', 'OPTIONS'],
+    'allowed_methods' => ['*'],
 
-    // Production: replace with explicit domains, local dev: use Vue app URL
-    'allowed_origins' => ['http://localhost:5174', 'http://127.0.0.1:5174'],
+    'allowed_origins' => ['http://localhost:5173'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Authorization', 'Content-Type', 'X-Requested-With'],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
-    // Mirrors legacy: OPTIONS → 204 No Content + preflight headers immediately
-    'max_age' => 86400,
+    'max_age' => 0,
 
-    // Allow cookies (ems_token) to be sent cross-origin.
-    // NOTE: When supports_credentials is true, allowed_origins CANNOT be '*'.
-    // Set allowed_origins to the explicit Vue origin in production.
     'supports_credentials' => false,
 
 ];

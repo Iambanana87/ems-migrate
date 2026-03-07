@@ -1,0 +1,15 @@
+﻿ΓåÆ Scanning create_device_action...
+  Γ£ù FETCH ERROR: Server error. Legacy: 500, Laravel: 200.
+
+{
+    "generated_at": "2026-03-06T14:24:54+07:00",
+    "total_drifts": 0,
+    "verdict": "FULL_API_PARITY_CERTIFIED",
+    "endpoints": {
+        "create_device_action": {
+            "status": "ERROR",
+            "error": "Server error. Legacy: 500, Laravel: 200.",
+            "drifts": []
+        }
+    }
+}

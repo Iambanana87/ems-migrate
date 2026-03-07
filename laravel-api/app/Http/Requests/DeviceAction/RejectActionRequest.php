@@ -22,7 +22,7 @@ class RejectActionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'    => ['required', 'integer', 'exists:device_actions,id'],
+            'id'    => ['required', 'integer'],
             'notes' => ['required', 'string', 'max:500'],
         ];
     }
@@ -32,7 +32,7 @@ class RejectActionRequest extends FormRequest
     {
         return [
             'id.exists'      => 'Action not found.',
-            'notes.required' => 'A rejection reason is required.',
+            'notes.required' => 'A rejection reason is required',
         ];
     }
 

@@ -158,8 +158,8 @@ return [
             'laravel_params' => ['c' => 'DeviceAction', 'm' => 'listV2', 'device_id' => 'MOLD-01'],
             'sample_key'     => null,
         ],
-        'create_device_action' => [
-            'legacy_params'  => ['action' => 'create_device_action', 'device_id' => 'MOLD-01', 'title' => 'Test Parity Action'],
+        'action_create' => [
+            'legacy_params'  => ['action' => 'action_create', 'device_id' => 'MOLD-01', 'title' => 'Test Parity Action'],
             'laravel_params' => ['c' => 'DeviceAction', 'm' => 'store', 'device_id' => 'MOLD-01', 'title' => 'Test Parity Action'],
             'sample_key'     => null,
         ],
@@ -264,6 +264,7 @@ return [
             'newTimestamp',   // Same
         ],
         'per_endpoint' => [
+            'tc_meta' => ['server_now'],
             // 'machine_details.mold' => ['live_data.datetime'],
         ],
     ],

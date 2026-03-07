@@ -1,0 +1,29 @@
+﻿ΓåÆ Scanning approve_action...
+  Γ£ù FAIL (1 drifts)
+
+{
+    "generated_at": "2026-03-06T14:24:58+07:00",
+    "total_drifts": 1,
+    "verdict": "DRIFT_DETECTED",
+    "endpoints": {
+        "approve_action": {
+            "status": "FAIL",
+            "drift_count": 1,
+            "drifts": [
+                {
+                    "path": "message",
+                    "type": "value_mismatch",
+                    "legacy": "reason required",
+                    "laravel": "Action not found.",
+                    "absent": {
+                        "legacy": false,
+                        "laravel": false
+                    },
+                    "detail": "Value mismatch"
+                }
+            ],
+            "legacy_url": "http:\/\/127.0.0.1:8081\/api.php?action=approve_action&action_id=100000",
+            "laravel_url": "http:\/\/127.0.0.1:8000\/api\/gateway?c=DeviceAction&m=approve&id=100000"
+        }
+    }
+}

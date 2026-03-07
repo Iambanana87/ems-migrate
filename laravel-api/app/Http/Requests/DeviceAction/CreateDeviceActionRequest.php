@@ -38,7 +38,7 @@ class CreateDeviceActionRequest extends FormRequest
     protected function failedValidation(Validator $validator): never
     {
         throw new HttpResponseException(
-            response()->json(['status' => 'error', 'message' => collect($validator->errors()->all())->first()], 400)
+            response()->json(['error' => collect($validator->errors()->all())->first()], 500)
         );
     }
 }
