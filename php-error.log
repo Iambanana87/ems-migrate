@@ -167,3 +167,156 @@
 [06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
 [06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
 [06-Mar-2026 14:17:32 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:24:23 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:24:23 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:24:23 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:24:24 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:24:24 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:24:24 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:24:53 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:24:53 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:24:53 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:24:54 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:24:54 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:24:54 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:27:36 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:27:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:28:18 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:29:05 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:29:16 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:29:16 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:29:38 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:29:49 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:29:49 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:31:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:32:10 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:32:10 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:32:25 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:32:36 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:32:36 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:43:52 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:44:01 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:44:01 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 14:44:21 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 14:44:31 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 14:44:31 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:55:08 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 15:55:18 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 15:55:18 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 15:56:22 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 15:56:32 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 15:56:32 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:03:12 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:03:23 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:03:23 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:05:39 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:06:59 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:07:10 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:07:10 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:07:41 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:07:41 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:07:41 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:07:42 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:07:42 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:07:42 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:07:52 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:07:52 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:09:34 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:09:34 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:09:34 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:09:35 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:09:35 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:09:35 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:10:49 Asia/Ho_Chi_Minh] [error] Missing token for /ems/api.php?action=create_device_action
+[06-Mar-2026 16:11:16 Asia/Ho_Chi_Minh] [error] JWT decode failed: Invalid token structure
+[06-Mar-2026 16:15:06 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:15:06 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:15:06 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=create_device_action, roles: 
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:19:33 Asia/Ho_Chi_Minh] API FATAL ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'due_date' in 'field list' in C:\xampp\htdocs\ems\api.php on line 2138
+[06-Mar-2026 16:19:44 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:19:44 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:20:40 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:20:40 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:22:00 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:22:00 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:25:51 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:25:51 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 16:30:15 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 16:30:15 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
+[06-Mar-2026 17:18:07 Asia/Ho_Chi_Minh] [info] Checking permission for endpoint: /ems/api.php?action=preview_next_codes, roles: 
+[06-Mar-2026 17:18:07 Asia/Ho_Chi_Minh] [info] Bypassing IAM for parity_scan user
